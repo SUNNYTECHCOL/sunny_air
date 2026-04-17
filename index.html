@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Simulador Aires Solares – Ingesolar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--k:#0A0A0A;--k2:#111111;--k3:#1A1A1A;--k4:#252525;
+--s:#F5C03A;--sd:#D4A020;--sm:rgba(245,192,58,.12);--sb:rgba(245,192,58,.06);
+--g:#4E9A57;--gl:#EAF5EC;
+--w:#FFFFFF;--g1:#F7F6F2;--g2:#E6E5E0;--g3:#AEADA7;--g4:#6E6D67;
+--er:#D94040;--r:16px;--rs:10px;
+--s3:rgba(245,192,58,.3);--s18:rgba(245,192,58,.18);--w06:rgba(255,255,255,.06);
+}
+html{scroll-behavior:smooth}
+body{font-family:"DM Sans",system-ui,sans-serif;background:var(--g1);color:var(--k);-webkit-font-smoothing:antialiased}
+header{background:var(--k);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;box-shadow:0 1px 0 var(--w06)}
+.logo-img{height:40px;object-fit:contain}
+.hcta{display:flex;align-items:center;gap:8px;background:var(--s);color:var(--k);border:none;border-radius:24px;padding:10px 20px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;letter-spacing:.2px}
+.hcta:hover{background:var(--sd);transform:translateY(-1px)}
+.hero{background:var(--k);padding:40px 24px 0;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,var(--s18) 0%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--sm);border:1px solid var(--s3);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--s);letter-spacing:.4px;margin-bottom:16px}
+.hero h1{font-family:"Libre Baskerville",serif;font-size:clamp(22px,5vw,34px);color:var(--w);line-height:1.2;margin-bottom:12px;position:relative;max-width:520px;margin-left:auto;margin-right:auto}
+.hero h1 span{color:var(--s)}
+.hero-sub{font-size:15px;color:var(--g3);line-height:1.6;max-width:440px;margin:0 auto 32px;position:relative}
+.iso-wrap{position:relative;max-width:700px;margin:0 auto;overflow:hidden}
+.iso-wrap img{width:100%;display:block;object-fit:cover;border-radius:16px 16px 0 0;filter:drop-shadow(0 -20px 60px rgba(0,0,0,.5))}
+.iso-overlay{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to top,var(--k),transparent)}
+.pnav{background:var(--k2);border-bottom:1px solid var(--k4);padding:14px 24px;position:sticky;top:64px;z-index:200}
+.pnav-inner{display:flex;align-items:center;justify-content:center;gap:0;max-width:360px;margin:0 auto}
+.pdot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:var(--k4);color:var(--g3);border:2px solid var(--k4);flex-shrink:0;transition:all .3s}
+.pdot.on{background:var(--s);border-color:var(--s);color:var(--k)}
+.pdot.dn{background:var(--sd);border-color:var(--sd);color:var(--k)}
+.pdot.dn span{display:none}
+.pdot.dn::after{content:"✓";font-size:15px}
+.pln{flex:1;height:2px;background:var(--k4);max-width:90px;transition:background .3s}
+.pln.dn{background:var(--sd)}
+.pnav-lbl{text-align:center;font-size:12px;color:var(--g3);margin-top:8px;letter-spacing:.3px}
+.tintro{max-width:660px;margin:0 auto;padding:28px 16px 0}
+.tintro-card{background:var(--k);border-radius:var(--r);overflow:hidden;margin-bottom:20px;box-shadow:0 4px 24px rgba(0,0,0,.12)}
+.tintro-head{padding:22px 22px 0}
+.tintro-tag{display:inline-block;background:var(--sm);color:var(--s);font-size:11px;font-weight:700;letter-spacing:.6px;padding:4px 12px;border-radius:12px;margin-bottom:12px}
+.tintro-title{font-family:"Libre Baskerville",serif;font-size:clamp(18px,4vw,22px);color:var(--w);line-height:1.3;margin-bottom:8px}
+.tintro-sub{font-size:13px;color:var(--g3);line-height:1.65;margin-bottom:18px}
+.modes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+.mode{padding:18px 16px 20px;border-top:1px solid var(--w06);position:relative;cursor:default}
+.mode:not(:last-child){border-right:1px solid var(--w06)}
+.mode.m1{background:linear-gradient(160deg,#1a1a00,#0A0A0A)}
+.mode.m2{background:#0A0A0A}
+.mode.m3{background:linear-gradient(160deg,#0a0a1a,#0A0A0A)}
+.mode-chip{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:8px;margin-bottom:10px}
+.mode.m1 .mode-chip{background:var(--s18);color:var(--s)}
+.mode.m2 .mode-chip{background:rgba(78,154,87,.18);color:#6FC677}
+.mode.m3 .mode-chip{background:rgba(136,153,255,.18);color:#8899FF}
+.mode-ic{font-size:30px;display:block;margin-bottom:10px}
+.mode-nm{font-size:13px;font-weight:700;color:var(--w);margin-bottom:6px;line-height:1.3}
+.mode-desc{font-size:11px;color:var(--g3);line-height:1.55}
+.install-strip{display:flex;align-items:center;gap:16px;padding:18px 22px;background:var(--sb);border-top:1px solid rgba(245,192,58,.12)}
+.install-ic{font-size:28px;flex-shrink:0}
+.install-text strong{display:block;font-size:14px;font-weight:700;color:var(--w);margin-bottom:2px}
+.install-text span{font-size:12px;color:var(--g3);line-height:1.5}
+.feat-section{max-width:660px;margin:0 auto;padding:0 16px 20px}
+.feat-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--g4);margin-bottom:12px;padding-left:2px}
+.feat-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fc{background:var(--w);border:1.5px solid var(--g2);border-radius:12px;padding:16px 14px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.fc::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0;opacity:0;transition:opacity .2s}
+.fc:hover{border-color:var(--sd);transform:translateY(-2px)}
+.fc:hover::before{opacity:1;background:var(--s)}
+.fc.accent{border-color:rgba(245,192,58,.35);background:linear-gradient(135deg,#fffdf0,var(--w))}
+.fc.accent::before{background:var(--s);opacity:1}
+.fc.wide{grid-column:1/-1}
+.fc-ic{font-size:26px;margin-bottom:8px}
+.fc-title{font-size:13px;font-weight:700;color:var(--k);margin-bottom:4px;line-height:1.3}
+.fc-sub{font-size:12px;color:var(--g4);line-height:1.55}
+.fc-tag{display:inline-block;background:var(--sm);color:var(--sd);font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;margin-top:6px}
+main{max-width:660px;margin:0 auto;padding:0 16px 100px}
+.sim-divider{display:flex;align-items:center;gap:12px;padding:24px 0 16px}
+.sim-divider-line{flex:1;height:1px;background:var(--g2)}
+.sim-divider-txt{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--g4);white-space:nowrap}
+.bhome{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1.5px solid var(--g2);color:var(--g4);padding:9px 14px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:14px;transition:all .15s;letter-spacing:.2px}
+.bhome:hover{border-color:var(--sd);color:var(--k);background:var(--sb)}
+.bhome:active{transform:scale(.97)}
+.card{background:var(--w);border-radius:var(--r);padding:24px 22px;box-shadow:0 1px 8px rgba(0,0,0,.07);display:none;animation:fu .25s ease;border:1.5px solid var(--g2)}
+.card.on{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.slb{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--g4);margin-bottom:12px;padding-bottom:7px;border-bottom:1.5px solid var(--g2);display:flex;align-items:center;gap:6px}
+.fg{display:grid;gap:12px;margin-bottom:18px}
+.c3{grid-template-columns:1fr 1fr 1fr}.c2{grid-template-columns:1fr 1fr}.c1{grid-template-columns:1fr}
+.fl label{display:block;font-size:11px;font-weight:700;color:var(--g4);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.fl input,.fl select{width:100%;padding:12px 14px;border:1.5px solid var(--g2);border-radius:var(--rs);font-family:inherit;font-size:15px;color:var(--k);background:var(--w);appearance:none;-webkit-appearance:none;-moz-appearance:none;transition:border-color .15s,box-shadow .15s;outline:none}
+.fl input:focus,.fl select:focus{border-color:var(--sd);box-shadow:0 0 0 3px rgba(245,192,58,.2)}
+.fl.inv input,.fl.inv select{border-color:var(--er)}
+.fl.inv .em{display:block}
+.em{font-size:11px;color:var(--er);margin-top:4px;display:none}
+.pvw{display:none;background:var(--sb);border:1.5px solid var(--s3);border-radius:var(--rs);padding:11px 14px;gap:18px;flex-wrap:wrap;font-size:13px;font-weight:600;color:var(--k);margin-bottom:14px}
+.pvw.show{display:flex}
+.chg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.ch{border:2px solid var(--g2);border-radius:10px;padding:13px 8px;cursor:pointer;text-align:center;transition:all .15s;background:var(--w);-webkit-tap-highlight-color:transparent;user-select:none}
+.ch:active{transform:scale(.97)}
+.ch.on{border-color:var(--sd);background:var(--sm);box-shadow:0 0 0 4px rgba(245,192,58,.12)}
+.ch .ic{font-size:22px;margin-bottom:5px}
+.ch .nm{font-size:12px;font-weight:700;line-height:1.25;color:var(--k)}
+.ch .tg{display:inline-block;background:var(--sm);color:var(--sd);font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;margin-top:4px}
+.chg.inv .ch{border-color:var(--er)}.chg.inv+.em{display:block}
+.ch.sc .ic{font-size:20px;margin-bottom:4px}
+.ch .sb{font-size:10px;color:var(--g4);margin-top:3px;line-height:1.35}
+.tb{background:var(--sb);border:1.5px solid var(--s3);border-radius:var(--rs);padding:16px;margin-bottom:16px}
+.tbh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.tbl{font-size:11px;font-weight:700;color:var(--g4);text-transform:uppercase}.tbs{font-size:11px;color:var(--g4)}
+.tbv{font-size:22px;font-weight:800;color:var(--k)}.tbk{font-size:11px;color:var(--g4)}
+input[type=range]{width:100%;appearance:none;-webkit-appearance:none;-moz-appearance:none;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--s) var(--pct,50%),var(--g2) var(--pct,50%));outline:none;cursor:pointer;margin:4px 0}
+input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--sd);border:3px solid var(--w);box-shadow:0 2px 8px rgba(0,0,0,.2);cursor:grab;transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:active{transform:scale(1.15)}
+.rl{display:flex;justify-content:space-between;font-size:10px;color:var(--g3);margin-top:2px}
+.dbx{background:#FFF8E6;border-left:3px solid #F0A020;border-radius:0 var(--rs) var(--rs) 0;padding:10px 13px;font-size:11px;color:#7A5000;line-height:1.6;margin-top:8px}
+.nav{display:flex;justify-content:space-between;margin-top:24px;gap:12px}
+.btn{padding:14px 26px;border-radius:10px;border:none;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;letter-spacing:.2px}
+.btn:active{transform:scale(.97)}
+.bbk{background:var(--g2);color:var(--g4);flex-shrink:0}
+.bnx{background:var(--s);color:var(--k);flex:1;box-shadow:0 4px 16px rgba(245,192,58,.3)}
+.bnx:hover{background:var(--sd);transform:translateY(-1px)}
+.bca{background:var(--k);color:var(--s);flex:1;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.bca:hover{background:var(--k3);transform:translateY(-1px)}
+#loadingScreen{display:none;position:fixed;inset:0;background:var(--k);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:24px}
+.ld-logo{height:44px;object-fit:contain;animation:ldpulse 1.5s ease-in-out infinite}
+@keyframes ldpulse{0%,100%{opacity:.5;transform:scale(.97)}50%{opacity:1;transform:scale(1)}}
+.ld-text{font-family:"Libre Baskerville",serif;font-size:22px;color:var(--w);text-align:center;line-height:1.4}
+.ld-text span{color:var(--s)}
+.ld-bar{width:200px;height:4px;background:var(--k4);border-radius:2px;overflow:hidden}
+.ld-bar-fill{height:100%;background:linear-gradient(90deg,var(--s),var(--sd));border-radius:2px;animation:ldbar 2.8s ease-in-out forwards}
+@keyframes ldbar{0%{width:0}60%{width:75%}90%{width:90%}100%{width:100%}}
+.ld-sub{font-size:13px;color:var(--g4);text-align:center}
+.ld-steps{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.ld-step{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--g4);animation:ldstep .4s ease forwards;opacity:0}
+.ld-step:nth-child(1){animation-delay:.3s}
+.ld-step:nth-child(2){animation-delay:.8s}
+.ld-step:nth-child(3){animation-delay:1.3s}
+.ld-step .ck{width:18px;height:18px;border-radius:50%;background:var(--sm);border:1.5px solid var(--sd);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+@keyframes ldstep{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+#res{display:none}
+.rh{background:var(--k);border-radius:var(--r);padding:24px 22px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.rh::after{content:"";position:absolute;bottom:-50px;left:50%;transform:translateX(-50%);width:260px;height:100px;background:radial-gradient(ellipse,rgba(245,192,58,.22),transparent 70%);pointer-events:none}
+.rhl{font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--g3);margin-bottom:6px}
+.rhm{font-family:"Libre Baskerville",serif;font-size:clamp(22px,5vw,30px);color:var(--s);font-weight:700}
+.rhs{font-size:13px;color:var(--g3);margin-top:6px}
+.rbg{display:inline-block;background:rgba(245,192,58,.15);border:1px solid rgba(245,192,58,.4);border-radius:20px;padding:5px 16px;font-size:12px;font-weight:700;color:var(--s);margin-top:10px}
+.malert{background:#FFF8E1;border:1.5px solid #F0A020;border-radius:var(--rs);padding:13px 16px;margin-bottom:14px;font-size:13px;line-height:1.6;color:#7A5000;display:none}
+.hg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.hg3{grid-template-columns:1fr 1fr}
+.hg3 .hc.wide{grid-column:1/-1}
+.hc.wide .hval{font-size:clamp(24px,6vw,32px)}
+.hc{background:var(--w);border:1.5px solid var(--g2);border-radius:12px;padding:18px 15px}
+.hc.accent{border-color:rgba(245,192,58,.4);background:linear-gradient(135deg,#fffef5,var(--w))}
+.hic{font-size:24px;margin-bottom:7px}.hlb{font-size:11px;color:var(--g4);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;font-weight:600}
+.hval{font-size:clamp(18px,4vw,24px);font-weight:800;color:var(--k);line-height:1.1}
+.hun{font-size:11px;color:var(--g4);margin-top:3px}.htip{font-size:11px;color:var(--g4);margin-top:5px;line-height:1.45}
+.comp-wrap{background:var(--w);border:1.5px solid var(--g2);border-radius:var(--rs);overflow:hidden;margin-bottom:14px}
+.comp-tit{padding:11px 15px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g4);background:var(--g1);border-bottom:1.5px solid var(--g2)}
+table.cpt{width:100%;border-collapse:collapse}
+table.cpt th{padding:10px 13px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--g4);border-bottom:1.5px solid var(--g2)}
+table.cpt th:nth-child(2){color:var(--g);background:var(--gl)}
+table.cpt td{padding:11px 13px;font-size:13px;border-bottom:1px solid var(--g2)}
+table.cpt tr:last-child td{border-bottom:none}
+table.cpt tr.cpt-sub td{background:var(--g1);border-top:1.5px solid var(--g2);border-bottom:1.5px solid var(--g2)}
+table.cpt tr.cpt-sub td:nth-child(2){background:var(--gl)}
+table.cpt td:nth-child(2){font-weight:700;color:var(--g);background:rgba(78,154,87,.04)}
+.lw{background:var(--k);border:2px solid var(--s);border-radius:var(--r);padding:24px 22px;margin-bottom:14px;box-shadow:0 8px 32px var(--s18);position:relative;overflow:hidden}
+.lw::before{content:"";position:absolute;top:-80px;right:-80px;width:200px;height:200px;background:radial-gradient(circle,rgba(245,192,58,.15),transparent 70%);pointer-events:none}
+.lt{font-size:18px;font-weight:700;color:var(--w);margin-bottom:6px;line-height:1.3;font-family:"Libre Baskerville",serif}
+.ls{font-size:13px;color:var(--g3);line-height:1.6;margin-bottom:20px}
+.lw .fl label{color:var(--g3)}
+.lw .fl input{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:var(--w)}
+.lw .fl input::placeholder{color:rgba(255,255,255,.3)}
+.lw .fl input:focus{border-color:var(--s);background:rgba(255,255,255,.1)}
+.bwp{width:100%;background:linear-gradient(135deg,#25D366,#1aad53);color:#fff;border:none;border-radius:12px;padding:18px 16px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.2px;box-shadow:0 6px 24px rgba(37,211,102,.3);margin-top:4px}
+.bwp:hover{background:linear-gradient(135deg,#1aad53,#128C3E);transform:translateY(-2px);box-shadow:0 8px 28px rgba(37,211,102,.4)}
+.bwp:active{transform:scale(.98)}
+.bwp-ic{font-size:20px}
+#lfs{font-size:13px;min-height:20px;margin-top:10px}
+.lfo{color:#6FC677;font-weight:700}.lfe{color:#FF7070;font-weight:700}
+.lpd{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:rgba(255,255,255,.75);line-height:1.55;margin:14px 0 6px;cursor:pointer;padding:12px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);transition:border-color .15s,background .15s}
+.lpd:hover{background:rgba(255,255,255,.06);border-color:rgba(245,192,58,.25)}
+.lpd input[type=checkbox]{flex-shrink:0;width:18px;height:18px;margin-top:1px;accent-color:var(--s);cursor:pointer}
+.lpd a{color:var(--s);text-decoration:underline;font-weight:600}
+.lpd a:hover{color:var(--sd)}
+.lpd.inv{border-color:var(--er);background:rgba(217,64,64,.08)}
+.lnot{font-size:11px;color:rgba(255,255,255,.3);margin-top:10px;line-height:1.55}
+.brs{background:none;border:1.5px solid var(--g2);color:var(--g4);padding:13px 20px;border-radius:10px;font-family:inherit;font-size:14px;cursor:pointer;width:100%;margin-top:10px;transition:all .15s;letter-spacing:.2px}
+.brs:hover{border-color:var(--g3);color:var(--k)}
+.fd{font-size:11px;color:var(--g4);line-height:1.7;padding:14px 4px 24px;border-top:1px solid var(--g2)}
+.fab{position:fixed;bottom:22px;right:18px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.fabp{background:var(--w);border-radius:var(--r);box-shadow:0 8px 36px rgba(0,0,0,.22);overflow:hidden;max-height:0;opacity:0;transition:max-height .3s,opacity .25s;pointer-events:none;min-width:250px}
+.fabp.op{max-height:220px;opacity:1;pointer-events:all}
+.fpt{background:var(--k);color:var(--s);font-size:13px;font-weight:700;padding:12px 16px;letter-spacing:.2px}
+.fo{display:flex;align-items:center;gap:13px;padding:13px 16px;text-decoration:none;color:var(--k);font-size:14px;font-weight:600;border-bottom:1px solid var(--g2);transition:background .1s}
+.fo:last-child{border-bottom:none}.fo:hover,.fo:active{background:var(--g1)}
+.fi{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.fw{background:#25D366;color:#fff}.fm{background:var(--s);color:var(--k)}.fp{background:#4285F4;color:#fff}
+.fabm{width:58px;height:58px;border-radius:50%;background:var(--s);color:var(--k);border:none;cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(245,192,58,.55);transition:all .2s}
+.fabm:hover{background:var(--sd);transform:scale(1.07)}.fabm.op{background:var(--k);color:var(--s)}
+.fbd{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--er);color:#fff;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--g1)}
+.fbr{position:relative}
+footer{background:var(--k);padding:16px 24px;text-align:center;font-size:12px;color:var(--g4);line-height:1.8}
+footer strong{color:var(--s)}
+@media(max-width:440px){
+.fg.c3{grid-template-columns:1fr 1fr}.chg{grid-template-columns:1fr 1fr}
+.hg{grid-template-columns:1fr 1fr}.feat-cards{grid-template-columns:1fr 1fr}.modes{grid-template-columns:1fr}
+.mode:not(:last-child){border-right:none;border-bottom:1px solid var(--w06)}
+header{padding:0 16px}main,.tintro,.feat-section{padding-left:12px;padding-right:12px}
+}
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<header>
+<img src="https://www.ingesolar.com.co/wp-content/uploads/2026/04/Logo-sin-fondo-Blanco.png" class="logo-img" alt="Ingesolar">
+<a class="hcta" id="hwa" target="_blank">&#x1F4AC; Hablar con un asesor</a>
+</header>
+<!-- LOADING -->
+<div id="loadingScreen">
+<img src="https://www.ingesolar.com.co/wp-content/uploads/2026/04/Logo-sin-fondo-Blanco.png" class="ld-logo" alt="Ingesolar">
+<div class="ld-text">Construyendo tu <span>simulaci&oacute;n solar</span>...</div>
+<div class="ld-bar"><div class="ld-bar-fill"></div></div>
+<div class="ld-steps">
+<div class="ld-step"><div class="ck">&#x2714;</div><span>Midiendo tu espacio y calculando BTU necesarios</span></div>
+<div class="ld-step"><div class="ck">&#x2714;</div><span>Seleccionando el modelo &oacute;ptimo para tu caso</span></div>
+<div class="ld-step"><div class="ck">&#x2714;</div><span>Calculando tu ahorro mensual y retorno de inversi&oacute;n</span></div>
+</div>
+</div>
+<!-- HERO -->
+<div class="hero">
+<div class="hero-badge">&#x2600;&#xFE0F; Tecnolog&iacute;a h&iacute;brida AC/DC</div>
+<h1>Tener confort t&eacute;rmico en tu hogar o empresa no deber&iacute;a disparar tu factura</h1>
+<p class="hero-sub">Deja que el Sol pague por ti</p>
+<div class="iso-wrap">
+<img src="https://www.ingesolar.com.co/wp-content/uploads/2026/04/Esquema-Aire-Solar.png" alt="Sistema de aire solar instalado en local comercial">
+<div class="iso-overlay"></div>
+</div>
+</div>
+<!-- PROGRESS -->
+<div class="pnav">
+<div class="pnav-inner">
+<div class="pdot on" id="d0"><span>1</span></div>
+<div class="pln" id="l0"></div>
+<div class="pdot" id="d1"><span>2</span></div>
+</div>
+<div class="pnav-lbl" id="plbl">Antes de simular &mdash; conoce la tecnolog&iacute;a</div>
+</div>
+<!-- TECH INTRO -->
+<div class="tintro" id="techIntro">
+<div class="tintro-card">
+<div class="tintro-head">
+<div class="tintro-tag">&#x1F50D; C&Oacute;MO FUNCIONA</div>
+<div class="tintro-title">Aire acondicionado h&iacute;brido con aprovechamiento solar directo</div>
+<div class="tintro-sub">El sistema prioriza energ&iacute;a solar durante el d&iacute;a y toma apoyo de la red cuando es necesario.</div>
+</div>
+<div class="modes">
+<div class="mode m1">
+<span class="mode-chip">D&Iacute;A SOLEADO</span><span class="mode-ic">&#x2600;&#xFE0F;</span>
+<div class="mode-nm">M&aacute;ximo aprovechamiento solar</div>
+<div class="mode-desc">Durante las horas de mayor radiaci&oacute;n, el equipo aprovecha al m&aacute;ximo la energ&iacute;a proveniente de los paneles.</div>
+</div>
+<div class="mode m2">
+<span class="mode-chip">D&Iacute;A PARCIALMENTE NUBLADO</span><span class="mode-ic">&#x26C5;&#xFE0F;</span>
+<div class="mode-nm">Prioriza solar y complementa con red</div>
+<div class="mode-desc">Cuando la radiaci&oacute;n disminuye, el sistema mantiene el aporte solar y toma respaldo de la red para sostener la operaci&oacute;n.</div>
+</div>
+<div class="mode m3">
+<span class="mode-chip">NOCHE</span><span class="mode-ic">&#x1F319;</span>
+<div class="mode-nm">Opera con energ&iacute;a de la red manteniendo eficiencia</div>
+<div class="mode-desc">En ausencia de radiaci&oacute;n solar, el equipo trabaja con energ&iacute;a de la red con la eficiencia propia de su tecnolog&iacute;a inverter.</div>
+</div>
+</div>
+<div class="install-strip">
+<div class="install-ic">&#x1F527;</div>
+<div class="install-text">
+<strong>Instalaci&oacute;n simplificada, sin bater&iacute;as</strong>
+<span>La unidad interior se comunica con la unidad exterior, y la unidad exterior recibe tanto la alimentaci&oacute;n de los paneles como el respaldo de la red para gestionar el funcionamiento del sistema.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- FEATURES -->
+<div class="feat-section" id="featSection">
+<div class="feat-section-title">&#x2728; Por qu&eacute; este equipo es diferente a cualquier aire que ya conoces</div>
+<p style="font-size:13px;color:var(--g4);line-height:1.6;margin:0 0 12px 2px">No es un aire convencional ni un inverter com&uacute;n: es un sistema h&iacute;brido dise&ntilde;ado para aprovechar energ&iacute;a solar de forma directa.</p>
+<div class="feat-cards">
+<div class="fc accent wide"><div class="fc-ic">&#x2744;&#xFE0F;&#x1F525;</div><div class="fc-title">Fr&iacute;o y calor con ajuste autom&aacute;tico</div><div class="fc-sub">El equipo acondiciona el espacio autom&aacute;ticamente, enfriando o calefaccionando seg&uacute;n la necesidad.</div><span class="fc-tag">CALEFACCI&Oacute;N + REFRIGERACI&Oacute;N</span></div>
+<div class="fc"><div class="fc-ic">&#x1F4F1;</div><div class="fc-title">Control por app</div><div class="fc-sub">Configura temperatura, monitorea el funcionamiento y gestiona el equipo desde tu celular.</div></div>
+<div class="fc"><div class="fc-ic">&#x1F33F;</div><div class="fc-title">Refrigerante R410A ecol&oacute;gico</div><div class="fc-sub">No inflamable y de menor impacto ambiental. Acompa&ntilde;ado por compresor doble rotativo DC Inverter para mayor eficiencia y vida &uacute;til.</div></div>
+</div>
+</div>
+<!-- CTA -->
+<div style="max-width:660px;margin:0 auto;padding:0 16px 24px">
+<button class="btn bnx" style="width:100%;font-size:16px;padding:18px;border-radius:12px;letter-spacing:.3px" onclick="startSim()">&#x26A1; Calcula ahora cu&aacute;nto ahorrar&iacute;as t&uacute; &rarr;</button>
+</div>
+<!-- SIMULATION -->
+<main id="simMain" style="display:none">
+<div class="sim-divider"><div class="sim-divider-line"></div><div class="sim-divider-txt">&#x1F4D0; Cuéntanos sobre tu espacio</div><div class="sim-divider-line"></div></div>
+<button class="bhome" onclick="goHome()" type="button">&larr; Volver a la informaci&oacute;n del producto</button>
+<!-- STEP 1 -->
+<div class="card on" id="s0">
+<div class="slb">&#x1F4D0; &iquest;C&oacute;mo es el espacio que quieres refrigerar?</div>
+<div class="fg c3" style="margin-bottom:10px">
+<div class="fl" id="fa"><label>Ancho (m)</label><input type="number" id="ancho" min="0.1" step="0.1" placeholder="4.0" inputmode="decimal" oninput="upv()"><div class="em">Requerido</div></div>
+<div class="fl" id="fl"><label>Largo (m)</label><input type="number" id="largo" min="0.1" step="0.1" placeholder="5.0" inputmode="decimal" oninput="upv()"><div class="em">Requerido</div></div>
+<div class="fl" id="fh"><label>Alto (m)</label><input type="number" id="alto" min="0.1" step="0.1" placeholder="2.8" inputmode="decimal" oninput="upv()"><div class="em">Requerido</div></div>
+</div>
+<div class="pvw" id="pvw"><span>&#x1F4D0; <strong id="pat">&ndash;</strong> m&sup2;</span><span>&#x1F4E6; <strong id="pvt">&ndash;</strong> m&sup3;</span></div>
+<div class="slb">&#x1F3E0; &iquest;Para qu&eacute; vas a usar este espacio?</div>
+<div class="chg" id="usoGrid">
+<div class="ch" data-f="0.05" onclick="su(this)"><div class="ic">&#x1F6CF;</div><div class="nm">Dormitorio</div><div class="tg">+5%</div></div>
+<div class="ch" data-f="0.10" onclick="su(this)"><div class="ic">&#x1F6CB;</div><div class="nm">Sala</div><div class="tg">+10%</div></div>
+<div class="ch" data-f="0.20" onclick="su(this)"><div class="ic">&#x1F3EA;</div><div class="nm">Local</div><div class="tg">+20%</div></div>
+<div class="ch" data-f="0.25" onclick="su(this)"><div class="ic">&#x1F4BC;</div><div class="nm">Oficina</div><div class="tg">+25%</div></div>
+<div class="ch" data-f="0.30" onclick="su(this)"><div class="ic">&#x1F37D;</div><div class="nm">Restaurante</div><div class="tg">+30%</div></div>
+<div class="ch" data-f="0.35" onclick="su(this)"><div class="ic">&#x1F3ED;</div><div class="nm">Industrial</div><div class="tg">+35%</div></div>
+</div>
+<div class="em" id="usoErr" style="margin-top:-10px;margin-bottom:12px">Selecciona el tipo de uso del espacio</div>
+<div class="slb">&#x1F465; Carga adicional</div>
+<div class="fg c3" style="margin-bottom:0">
+<div class="fl"><label>Personas habituales en el espacio</label><input type="number" id="per" min="0" value="2" inputmode="numeric"><small style="display:block;font-size:11px;color:var(--g4);margin-top:4px">Ingresa la cantidad promedio de personas, no el m&aacute;ximo ocasional.</small></div>
+<div class="fl"><label>Equipos electr&oacute;nicos en uso habitual</label><input type="number" id="equ" min="0" value="1" inputmode="numeric"><small style="display:block;font-size:11px;color:var(--g4);margin-top:4px">Cuenta los equipos que normalmente permanecen encendidos.</small></div>
+<div class="fl"><label>Ventanas/Puertas</label><input type="number" id="abe" min="0" value="2" inputmode="numeric"></div>
+</div>
+<div class="nav"><div></div><button class="btn bnx" onclick="nx(0)">Siguiente &rarr;</button></div>
+</div>
+<!-- STEP 2 -->
+<div class="card" id="s1">
+<div class="slb">&#x1F4CD; &iquest;D&oacute;nde est&aacute;s y cu&aacute;nto pagas de luz?</div>
+<div class="fg c1" style="margin-bottom:10px">
+<div class="fl" id="fdp">
+<label>Departamento</label>
+<select id="dep" onchange="odc()">
+<option value="">&mdash; Selecciona tu departamento &mdash;</option>
+<optgroup label="Costa Caribe (Air-e &middot; $796/kWh)">
+<option value="796" data-op="Air-e" data-src="Min. Minas ene-2026">Atl&aacute;ntico</option>
+<option value="796" data-op="Air-e" data-src="Min. Minas ene-2026">Magdalena</option>
+<option value="796" data-op="Air-e" data-src="Min. Minas ene-2026">La Guajira</option>
+</optgroup>
+<optgroup label="Costa Caribe (AFINIA &middot; $879/kWh)">
+<option value="879" data-op="AFINIA" data-src="Min. Minas ene-2026">Bol&iacute;var</option>
+<option value="879" data-op="AFINIA" data-src="Min. Minas ene-2026">C&oacute;rdoba</option>
+<option value="879" data-op="AFINIA" data-src="Min. Minas ene-2026">Sucre / Cesar</option>
+</optgroup>
+<optgroup label="Interior y Eje Cafetero">
+<option value="840" data-op="EPM" data-src="EPM 2025">Antioquia</option>
+<option value="890" data-op="Enel" data-src="Enel 2025">Bogot&aacute; D.C.</option>
+<option value="890" data-op="Enel" data-src="Enel 2025">Cundinamarca</option>
+<option value="855" data-op="Celsia/Emcali" data-src="Celsia 2025">Valle del Cauca</option>
+<option value="870" data-op="ESSA" data-src="Ref. 2025">Santander</option>
+<option value="860" data-op="CHEC" data-src="Ref. 2025">Caldas / Risaralda / Quind&iacute;o</option>
+<option value="860" data-op="Electrificadora" data-src="Ref. 2025">Tolima</option>
+<option value="870" data-op="Electrohuila" data-src="Ref. 2025">Huila</option>
+<option value="875" data-op="Cedenar" data-src="Ref. 2025">Nari&ntilde;o</option>
+<option value="865" data-op="Electroboyac&aacute;" data-src="Ref. 2025">Boyac&aacute;</option>
+<option value="860" data-op="Regional" data-src="Ref. 2025">Meta / Caquet&aacute; / Putumayo</option>
+<option value="1100" data-op="ZNI" data-src="UPME 2025">San Andr&eacute;s</option>
+</optgroup>
+<optgroup label="Otro"><option value="860" data-op="Promedio nacional" data-src="Estimado 2025">Otro departamento</option></optgroup>
+</select>
+<div class="em">Selecciona un departamento</div>
+</div>
+</div>
+<div class="tb" id="tbx" style="display:none">
+<div class="tbh">
+<div><div class="tbl">Tarifa referencia</div><div class="tbs" id="tsrc">&mdash;</div></div>
+<div style="text-align:right"><div class="tbv">$<span id="tdsp">&mdash;</span></div><div class="tbk">COP/kWh</div></div>
+</div>
+<input type="range" id="tsl" min="400" max="1500" step="10" value="796" oninput="osl(this)">
+<div class="rl"><span>$400</span><span>$950</span><span>$1.500</span></div>
+<div class="dbx">&#x26A0;&#xFE0F; <strong>Ajusta con tu factura real.</strong> Busca el campo &ldquo;Costo Unitario (CU)&rdquo; en tu recibo de energ&iacute;a.</div>
+</div>
+<div class="slb">&#x1F3E2; Cantidad de espacios</div>
+<div class="fg c1" style="margin-bottom:18px">
+<div class="fl"><label>N&uacute;mero de espacios a climatizar</label>
+<select id="cnt"><option value="1">1 espacio</option><option value="2">2 espacios</option><option value="3">3 espacios</option><option value="4">4 espacios</option><option value="5">5 espacios</option></select>
+</div>
+</div>
+<div class="slb">&#x23F0; Horario de uso</div>
+<div class="chg" id="horGrid">
+<div class="ch sc on" data-f="1.0" onclick="sm(this)"><div class="ic">&#x2600;&#xFE0F;</div><div class="nm">Diurno</div><div class="sb">7am&ndash;5pm &middot; M&aacute;x. ahorro</div></div>
+<div class="ch sc" data-f="0.55" onclick="sm(this)"><div class="ic">&#x26C5;&#xFE0F;</div><div class="nm">Mixto</div><div class="sb">D&iacute;a y parte noche</div></div>
+<div class="ch sc" data-f="0.15" onclick="sm(this)"><div class="ic">&#x1F319;</div><div class="nm">Nocturno</div><div class="sb">Principalmente noche</div></div>
+</div>
+<div class="nav"><button class="btn bbk" onclick="bk()">&larr; Atr&aacute;s</button><button class="btn bca" onclick="calc()">&#x1F506; Ver mi ahorro &rarr;</button></div>
+</div>
+<!-- RESULTS -->
+<div id="res">
+<div class="rh"><div class="rhl">&#x1F389; Tu simulaci&oacute;n est&aacute; lista</div><div class="rhm" id="rm">&ndash;</div><div class="rhs" id="rs">&ndash;</div><div class="rbg" id="rb">&ndash;</div></div>
+<div class="malert" id="rma"></div>
+<div style="background:#FFF8E6;border:1.5px solid #F0A020;border-radius:var(--rs);padding:13px 16px;margin-bottom:14px;font-size:12px;line-height:1.65;color:#7A5000"><strong>Importante:</strong> esta simulaci&oacute;n es aproximada y no reemplaza la visita t&eacute;cnica obligatoria, necesaria para definir las caracter&iacute;sticas finales de tu proyecto.</div>
+<div class="hg hg3">
+<div class="hc accent wide"><div class="hic">&#x1F4B8;</div><div class="hlb">Valor estimado del proyecto</div><div class="hval" id="rv">&ndash;</div><div class="hun">COP estimado</div><div class="htip" id="rv2">&ndash;</div></div>
+<div class="hc accent"><div class="hic">&#x23F3;</div><div class="hlb">Payback estimado</div><div class="hval" id="rp">&ndash;</div><div class="hun">a&ntilde;os</div><div class="htip" id="rp2">&ndash;</div></div>
+<div class="hc"><div class="hic">&#x1F4B0;</div><div class="hlb">Ahorro anual estimado</div><div class="hval" id="ra">&ndash;</div><div class="hun">COP al a&ntilde;o</div><div class="htip" id="ra2">&ndash;</div></div>
+</div>
+<div class="comp-wrap">
+<div class="comp-tit">Comparativo Solar vs Convencional <span style="display:block;font-size:10px;font-weight:600;letter-spacing:.2px;text-transform:none;color:var(--g4);margin-top:4px">Valores estimados con instalaci&oacute;n incluida</span></div>
+<table class="cpt">
+<thead><tr><th>Concepto</th><th>&#x2600; Solar</th><th>Convencional</th></tr></thead>
+<tbody>
+<tr><td>Valor del sistema</td><td id="cvs">&ndash;</td><td id="cvc">&ndash;</td></tr>
+<tr><td>Mano de obra estimada</td><td id="cis">&ndash;</td><td id="cic">&ndash;</td></tr>
+<tr class="cpt-sub"><td><strong>Inversi&oacute;n inicial total</strong></td><td id="cps"><strong>&ndash;</strong></td><td id="cpc"><strong>&ndash;</strong></td></tr>
+<tr><td>Consumo red / mes</td><td id="ccs">&ndash;</td><td id="ccc">&ndash;</td></tr>
+<tr><td>Costo energ&iacute;a / mes</td><td id="ces">&ndash;</td><td id="cec">&ndash;</td></tr>
+<tr><td>Costo energ&iacute;a / a&ntilde;o</td><td id="cas">&ndash;</td><td id="cac">&ndash;</td></tr>
+<tr><td>Mantenimiento / a&ntilde;o</td><td id="cms">&ndash;</td><td id="cmc">&ndash;</td></tr>
+<tr><td colspan="3" style="font-size:11px;color:var(--g3);padding:6px 13px;line-height:1.5">* El valor de mano de obra es estimado y se confirma tras visita t&eacute;cnica obligatoria. El mantenimiento solar incluye limpieza de paneles, revisi&oacute;n del kit solar y servicio del equipo AC.</td></tr>
+</tbody>
+</table>
+</div>
+<!-- LEAD FORM -->
+<div class="lw">
+<div class="lt">&#x1F4B8; &iexcl;Empieza a ahorrar este mes!</div>
+<div class="ls">Esta simulaci&oacute;n te da una estimaci&oacute;n cercana de tu ahorro. Para confirmar los valores exactos seg&uacute;n las condiciones de tu espacio, escr&iacute;benos por WhatsApp y recibe tu cotizaci&oacute;n formal con la visita t&eacute;cnica incluida. Sin compromiso, sin presiones.</div>
+<div class="fg c1" style="margin-bottom:12px"><div class="fl"><label>Nombre completo</label><input type="text" id="lnn" placeholder="Tu nombre" autocomplete="name"></div></div>
+<div class="fg c2" style="margin-bottom:12px">
+<div class="fl"><label>Tel&eacute;fono / WhatsApp</label><input type="tel" id="lnt" placeholder="3XX XXX XXXX" inputmode="tel" autocomplete="tel"></div>
+<div class="fl"><label>Correo electr&oacute;nico</label><input type="email" id="lne" placeholder="tu@correo.com" inputmode="email" autocomplete="email"></div>
+</div>
+<button class="bwp" onclick="lwp()"><span class="bwp-ic">&#x1F4AC;</span><span>Obt&eacute;n tu cotizaci&oacute;n por WhatsApp</span></button>
+<div id="lfs"></div>
+<label class="lpd" id="lpd">
+<input type="checkbox" id="lpdc">
+<span>Acepto la <a href="https://drive.google.com/file/d/1-qOHaPdv22TjdKBVEWMg7ryII2_weoMB/view?usp=drive_link" target="_blank" rel="noopener">pol&iacute;tica de tratamiento de datos personales</a> de Ingesolar y autorizo el uso de mi informaci&oacute;n para ser contactado con la cotizaci&oacute;n solicitada.</span>
+</label>
+<div class="lnot">&#x1F512; Tus datos son privados. Solo los usamos para enviarte tu simulaci&oacute;n y atenderte v&iacute;a WhatsApp.</div>
+</div>
+<div class="fd">* Estimaciones con tarifas referencia 2025 (Min. Minas, CREG). C&aacute;lculo BTU est&aacute;ndar ASHRAE clima tropical colombiano (150 BTU/m&sup3;, RETIE, NTC-2052). Ahorro en escenario uso intensivo (&sim;16 h/d&iacute;a); el ahorro real var&iacute;a seg&uacute;n horas de uso, tarifa vigente e irradiaci&oacute;n solar local.</div>
+<button class="brs" onclick="rst()">&#x21BA; Hacer una nueva simulaci&oacute;n</button>
+</div>
+</main>
+<!-- FAB -->
+<div class="fab">
+<div class="fabp" id="fabp">
+<div class="fpt">&#x2600; Habla con un asesor Ingesolar</div>
+<a class="fo" id="fwa" target="_blank"><div class="fi fw">&#x1F4AC;</div><div><div>WhatsApp</div><div style="font-size:11px;color:var(--g4)">313 645 1800 &middot; Respuesta inmediata</div></div></a>
+<a class="fo" id="fma"><div class="fi fm">&#x2709;</div><div><div>Correo electr&oacute;nico</div><div style="font-size:11px;color:var(--g4)" id="fmtxt">&ndash;</div></div></a>
+<a class="fo" href="https://maps.app.goo.gl/VETniMatPcjH4sss7" target="_blank"><div class="fi fp">&#x1F4CD;</div><div><div>Showroom Medell&iacute;n</div><div style="font-size:11px;color:var(--g4)">Ver en Google Maps</div></div></a>
+</div>
+<div class="fbr"><button class="fabm" id="fabm" onclick="tf()" aria-label="Contacto">&#x1F4AC;</button><div class="fbd" id="fbd">1</div></div>
+</div>
+<footer><strong>INGESOLAR</strong> &nbsp;&middot;&nbsp; Importadores y distribuidores de energ&iacute;a solar<br>Bogot&aacute; &middot; Medell&iacute;n &middot; Villavicencio</footer>
+<script>
+var $=function(i){return document.getElementById(i)},$$=function(s){return document.querySelectorAll(s)};
+(function(){
+var wn='3136451800',wb='https://wa.me/'+wn,ml='ingesolarmedellin'+'@'+'gmail.com',mg=encodeURIComponent('Hola Ingesolar, visit\u00e9 su sitio web y quisiera recibir asesor\u00eda. \u00bfPodr\u00edan ayudarme?');
+$('hwa').href=wb+'?text='+mg;$('fwa').href=wb+'?text='+mg;$('fma').href='mailto:'+ml;$('fmtxt').textContent=ml;
+window._WB=wb;window._ML=ml;
+})();
+var SWURL='https://script.google.com/macros/s/AKfycbx5jgiKSVpePdWIJ92BX8W1yZl1L-SPutc_EVxQZrjvChXVgHlJaSNu9pltn-RarCyo/exec';
+
+// ────────────────────────────────────────────────────────────────────
+// CFG: parámetros comerciales con valores por defecto (fallback).
+// Se sobrescriben en runtime con el CSV remoto (loadCFG()).
+// Cualquier ajuste de precios, tarifas o factores se hace en el Sheet.
+// ────────────────────────────────────────────────────────────────────
+var CFG={
+TASA:0.05,                       // inflación energética anual
+TAR_DEFAULT:840,                 // tarifa OR por defecto (COP/kWh)
+BTU_M3:150,BTU_PER:700,BTU_EQ:600,BTU_AB:1200,  // factores BTU (ASHRAE)
+MF_DIA:1.0,MF_MIX:0.55,MF_NOC:0.15,             // % aporte solar por modo horario
+UF_DORM:0.05,UF_SALA:0.10,UF_LOC:0.20,UF_OFI:0.25,UF_RES:0.30,UF_IND:0.35, // recargo por uso
+LD_DELAY:3000,                   // delay del loading screen (ms)
+// ── Instalación dinámica por tecnología (conv/sol) × capacidad (12k/18k/24k) ──
+// Formato de llave: inst_<tecnologia>_<capacidad>
+inst_conv_12k:461538,
+inst_conv_18k:715385,
+inst_conv_24k:969231,
+inst_sol_12k:2123400,
+inst_sol_18k:2811900,
+inst_sol_24k:3435150,
+// ── Catálogo de equipos: precio (sp/cp), consumo (sg/cm) y mantenimiento (sm2/cv) ──
+AC:{
+'12K':{btu:12000,sp:7078000,cp:2000000,sg:0,cm:300,sm2:500000,cv:300000,lb:'12.000 BTU'},
+'18K':{btu:18000,sp:9373000,cp:3100000,sg:0,cm:420,sm2:600000,cv:400000,lb:'18.000 BTU'},
+'24K':{btu:24000,sp:11450500,cp:4200000,sg:0,cm:540,sm2:700000,cv:500000,lb:'24.000 BTU'}
+}
+};
+// URL del CSV publicado: File → Share → Publish to web → CSV (Google Sheets)
+// Estructura esperada: 2 columnas (key, value). Reemplazar cuando esté lista la hoja.
+var CFG_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vSgq2Cij7HEvDodeXyVtuFO1bdKKRYxV1Szd000UM36wb0Yl5qz_4AYHsYjwi3OAGxb0AGSpLf2_r3h/pub?gid=0&single=true&output=csv';
+
+// Parser CSV minimal — soporta comillas, separador coma y saltos de línea
+function parseCSV(t){
+var rows=[],r=[],s='',q=false,i;
+for(i=0;i<t.length;i++){
+var c=t[i],n=t[i+1];
+if(q){if(c=='"'&&n=='"'){s+='"';i++;}else if(c=='"'){q=false;}else{s+=c;}}
+else{if(c=='"'){q=true;}else if(c==','){r.push(s);s='';}else if(c=='\n'||c=='\r'){if(s||r.length){r.push(s);rows.push(r);r=[];s='';}if(c=='\r'&&n=='\n')i++;}else{s+=c;}}
+}
+if(s||r.length){r.push(s);rows.push(r);}
+return rows;
+}
+
+// Normaliza un string numérico: elimina separadores de miles, símbolos de moneda y espacios
+// Acepta: "1.500.000", "1,500,000", "$1500000", "COP 1500000", "1500000.50"
+function cfgNum(v){
+if(v===null||v===undefined)return NaN;
+var s=String(v).trim();
+if(!s)return NaN;
+// Remove currency symbols and spaces
+s=s.replace(/[$\s]|COP|cop/g,'');
+// Heuristic: if the string has both comma and period, the last of the two is the decimal separator
+var hasC=s.indexOf(',')>-1,hasP=s.indexOf('.')>-1;
+if(hasC&&hasP){
+if(s.lastIndexOf(',')>s.lastIndexOf('.')){s=s.replace(/\./g,'').replace(',','.');}
+else{s=s.replace(/,/g,'');}
+}else if(hasC){
+// Solo comas: si hay más de una, son separadores de miles (1,500,000); si hay una y <=3 decimales no, igual tratamos como miles
+var parts=s.split(',');
+if(parts.length>2||(parts.length===2&&parts[1].length===3)){s=s.replace(/,/g,'');}
+else{s=s.replace(',','.');}
+}else if(hasP){
+// Solo puntos: si más de uno son separadores de miles
+var partsP=s.split('.');
+if(partsP.length>2||(partsP.length===2&&partsP[1].length===3)){s=s.replace(/\./g,'');}
+}
+return parseFloat(s);
+}
+
+// Aplica overrides del CSV sobre el objeto CFG (preserva fallback si fila inválida)
+function applyCFG(rows){
+if(!rows||!rows.length)return;
+var applied=0,skipped=0;
+for(var i=0;i<rows.length;i++){
+var k=(rows[i][0]||'').trim(),v=(rows[i][1]||'').trim();
+if(!k||k.toLowerCase()=='key'||k.charAt(0)=='#'){skipped++;continue;}
+// Patrón AC.<modelo>.<campo> ej "AC.12K.sp"
+if(k.indexOf('AC.')===0){
+var p=k.split('.');
+if(p.length===3&&CFG.AC[p[1]]&&p[2] in CFG.AC[p[1]]){
+var nv=cfgNum(v);if(!isNaN(nv)){CFG.AC[p[1]][p[2]]=nv;applied++;}else{skipped++;console.warn('[CFG] Valor inválido ignorado:',k,'=',v);}
+}else{skipped++;console.warn('[CFG] Llave AC desconocida ignorada:',k);}
+}else if(k in CFG){
+var nv2=cfgNum(v);if(!isNaN(nv2)){CFG[k]=nv2;applied++;}else{skipped++;console.warn('[CFG] Valor inválido ignorado:',k,'=',v);}
+}else{
+skipped++;console.warn('[CFG] Llave desconocida ignorada:',k);
+}
+}
+console.log('[CFG] Overrides aplicados:',applied,'| ignorados:',skipped);
+}
+
+// Estado de carga del CFG — permite a calc() esperar si aún no resolvió
+window._cfgReady=false;
+window._cfgPromise=null;
+
+// Carga remota — retorna Promise. Logs visibles para diagnóstico.
+function loadCFG(){
+if(!CFG_URL){console.warn('[CFG] CFG_URL vacío — usando fallback');window._cfgReady=true;return Promise.resolve();}
+console.log('[CFG] Cargando configuración desde:',CFG_URL);
+window._cfgPromise=fetch(CFG_URL,{method:'GET',cache:'no-store',redirect:'follow'})
+.then(function(r){
+if(!r.ok){throw new Error('HTTP '+r.status+' '+r.statusText);}
+return r.text();
+})
+.then(function(t){
+if(!t||!t.length){console.warn('[CFG] CSV vacío');window._cfgReady=true;return;}
+var rows=parseCSV(t);
+console.log('[CFG] CSV descargado:',rows.length,'filas');
+applyCFG(rows);
+window._cfgReady=true;
+console.log('[CFG] \u2705 Configuración aplicada. Muestra de valores activos:',{
+TASA:CFG.TASA,
+TAR_DEFAULT:CFG.TAR_DEFAULT,
+'AC.12K.sp':CFG.AC['12K'].sp,
+'AC.18K.sp':CFG.AC['18K'].sp,
+'AC.24K.sp':CFG.AC['24K'].sp,
+inst_sol_12k:CFG.inst_sol_12k,
+inst_sol_18k:CFG.inst_sol_18k,
+inst_sol_24k:CFG.inst_sol_24k
+});
+})
+.catch(function(e){
+console.error('[CFG] \u274c Error al cargar CSV:',e.message);
+console.warn('[CFG] Operando con valores fallback del código');
+window._cfgReady=true;
+});
+return window._cfgPromise;
+}
+loadCFG();
+
+// Alias retro-compatibles. NOTA: AC es referencia al objeto dentro de CFG,
+// por lo que cualquier update de CFG.AC.X.Y vía CSV se refleja automáticamente.
+// Los valores escalares (mf, tar) se inicializan con fallback pero se
+// actualizan en tiempo real cuando el usuario interactúa o desde el CSV.
+var AC=CFG.AC;
+var uf=null,mf=CFG.MF_DIA,tar=CFG.TAR_DEFAULT;
+function startSim(){
+var h=document.querySelector('.hero');if(h)h.style.display='none';
+$('techIntro').style.display='none';$('featSection').style.display='none';
+$$('[onclick="startSim()"]').forEach(function(b){b.style.display='none';});
+var p=document.querySelector('.pnav');if(p)p.style.top='64px';
+$('simMain').style.display='block';$('plbl').textContent='Paso 1 de 2 \u2014 Tu espacio';
+window.scrollTo({top:0,behavior:'smooth'});
+}
+function goHome(){
+var h=document.querySelector('.hero');if(h)h.style.display='block';
+$('techIntro').style.display='block';$('featSection').style.display='block';
+$$('[onclick="startSim()"]').forEach(function(b){b.style.display='';});
+$('simMain').style.display='none';$('res').style.display='none';
+$('plbl').textContent='Antes de simular \u2014 conoce la tecnolog\u00eda';
+var d0=$('d0'),d1=$('d1'),l0=$('l0');
+d0.classList.remove('on','dn');d1.classList.remove('on','dn');l0.classList.remove('dn');d0.classList.add('on');
+window.scrollTo({top:0,behavior:'smooth'});
+}
+function selM(b){
+if(b<=12000)return{k:'12K',u:1,combo:false};
+if(b<=18000)return{k:'18K',u:1,combo:false};
+if(b<=24000)return{k:'24K',u:1,combo:false};
+var n=Math.ceil(b/24000),r=b-(n-1)*24000;
+if(r<=12000&&n>1)return{k:'24K',u:n-1,ck:'12K',cu:1,combo:true,tb:(n-1)*24000+12000};
+return{k:'24K',u:n,combo:false,tb:n*24000};
+}
+function nx(s){if(!vl(s))return;goStep(1);}
+function bk(){goStep(0);}
+function goStep(n){
+$$('.card').forEach(function(c){c.classList.remove('on');});
+$('s'+n).classList.add('on');
+var d0=$('d0'),d1=$('d1'),l0=$('l0');
+d0.classList.remove('on','dn');d1.classList.remove('on','dn');l0.classList.remove('dn');
+if(n===0){d0.classList.add('on');$('fdp').classList.remove('inv');}
+else{d0.classList.add('dn');l0.classList.add('dn');d1.classList.add('on');['fa','fl','fh'].forEach(function(id){$(id).classList.remove('inv');});$('usoGrid').classList.remove('inv');}
+$('res').style.display='none';
+$('plbl').textContent=n===0?'Paso 1 de 2 \u2014 Tu espacio':'Paso 2 de 2 \u2014 Ubicaci\u00f3n y horario';
+window.scrollTo({top:0,behavior:'smooth'});
+}
+function vl(s){
+var ok=true;
+if(s===0){
+['fa','fl','fh'].forEach(function(id,i){
+var v=parseFloat($(['ancho','largo','alto'][i]).value);
+$(id).classList.toggle('inv',!v||v<=0);if(!v||v<=0)ok=false;
+});
+var ui=uf===null;$('usoGrid').classList.toggle('inv',ui);if(ui)ok=false;
+}
+if(s===1&&!$('dep').value){$('fdp').classList.add('inv');return false;}
+return ok;
+}
+function su(el){$$('#usoGrid .ch').forEach(function(c){c.classList.remove('on');});el.classList.add('on');uf=parseFloat(el.dataset.f);$('usoGrid').classList.remove('inv');}
+function sm(el){$$('#horGrid .ch').forEach(function(c){c.classList.remove('on');});el.classList.add('on');mf=parseFloat(el.dataset.f);}
+function upv(){
+var a=parseFloat($('ancho').value)||0,l=parseFloat($('largo').value)||0,h=parseFloat($('alto').value)||0,pv=$('pvw');
+if(a>0&&l>0&&h>0){pv.classList.add('show');$('pat').textContent=(a*l).toFixed(1);$('pvt').textContent=(a*l*h).toFixed(1);}
+else pv.classList.remove('show');
+}
+function odc(){
+var sel=$('dep'),opt=sel.options[sel.selectedIndex],v=parseInt(sel.value)||0;
+if(!v||isNaN(v)){$('tbx').style.display='none';return;}
+$('fdp').classList.remove('inv');tar=v;var sl=$('tsl');sl.value=v;usb(sl);
+$('tdsp').textContent=v.toLocaleString('es-CO');
+$('tsrc').textContent=(opt.dataset.op||'\u2013')+' \u00b7 '+(opt.dataset.src||'\u2013');
+$('tbx').style.display='block';
+}
+function osl(sl){tar=parseInt(sl.value);$('tdsp').textContent=tar.toLocaleString('es-CO');usb(sl);}
+function usb(sl){sl.style.setProperty('--pct',((sl.value-sl.min)/(sl.max-sl.min)*100).toFixed(1)+'%');}
+function calc(){
+if(!$('dep').value){$('fdp').classList.add('inv');window.scrollTo({top:0,behavior:'smooth'});return;}
+// ── Esperar a que el CFG termine de cargar (evita usar fallback si CSV aún viene en vuelo) ──
+if(!window._cfgReady&&window._cfgPromise){
+console.log('[CFG] Esperando a que termine de cargar antes de calcular...');
+window._cfgPromise.then(function(){calc();});
+return;
+}
+var a=parseFloat($('ancho').value),l=parseFloat($('largo').value),h=parseFloat($('alto').value);
+var per=parseInt($('per').value)||0,eq=parseInt($('equ').value)||0,ab=parseInt($('abe').value)||0;
+var cs=parseInt($('cnt').value)||1,vol=a*l*h;
+var bb=vol*CFG.BTU_M3+per*CFG.BTU_PER+eq*CFG.BTU_EQ+ab*CFG.BTU_AB,bs=Math.round(bb*(1+uf)),bt=bs*cs;
+var sel=selM(bt),m1=AC[sel.k],u=sel.u,m2=sel.combo?AC[sel.ck]:null,cu=sel.combo?sel.cu:0;
+var spT=m1.sp*u+(m2?m2.sp*cu:0),cpT=m1.cp*u+(m2?m2.cp*cu:0),dp=spT-cpT;
+// ── Selección dinámica de instalación ──
+// Tecnología: 'sol' para aire solar híbrido AC/DC · 'conv' para aire tradicional
+// Capacidad: '12k' / '18k' / '24k' según modelo seleccionado por BTU
+var tecnologia='sol';                         // este simulador promociona la línea solar
+var capacidad=sel.k.toLowerCase();            // '12K' → '12k', '18K' → '18k', '24K' → '24k'
+var capacidadCombo=sel.combo?sel.ck.toLowerCase():null;
+// Llaves construidas dinámicamente: inst_sol_18k, inst_conv_24k, etc.
+var instSol=CFG['inst_sol_'+capacidad]*u+(m2?CFG['inst_sol_'+capacidadCombo]*cu:0);
+var instConv=CFG['inst_conv_'+capacidad]*u+(m2?CFG['inst_conv_'+capacidadCombo]*cu:0);
+var ipT=instSol,isT=spT-ipT;                  // mano de obra solar + sistema solar
+var ipcT=instConv,icsT=cpT-ipcT;              // mano de obra conv + sistema conv
+var sg=m1.sg*u+(m2?m2.sg*cu:0),cm=m1.cm*u+(m2?m2.cm*cu:0);
+var gm=mf*sg+(1-mf)*cm,csm=gm*tar,ccm=cm*tar,aem=ccm-csm,aea=aem*12;
+var msT=m1.sm2*u+(m2?m2.sm2*cu:0),mcT=m1.cv*u+(m2?m2.cv*cu:0),am=mcT-msT,an=aea+am;
+var pb=an>0?dp/an:99;
+var TASA=CFG.TASA,ac=0,by=null,r10=0;
+for(var y=1;y<=10;y++){var tY=tar*Math.pow(1+TASA,y-1);ac+=(cm-gm)*12*tY+am;if(by===null&&(ac-dp)>=0)by=y;if(y===10)r10=ac-dp;}
+var ml2=sel.combo?u+'\u00d7 '+m1.lb+' + '+cu+'\u00d7 '+AC[sel.ck].lb:(u>1?u+'\u00d7 '+m1.lb:m1.lb);
+$('s1').classList.remove('on');$('loadingScreen').style.display='flex';
+window._CALC={spT:spT,cpT:cpT,ipT:ipT,isT:isT,ipcT:ipcT,icsT:icsT,dp:dp,sg:sg,cm:cm,gm:gm,csm:csm,ccm:ccm,aem:aem,aea:aea,msT:msT,mcT:mcT,am:am,an:an,pb:pb,r10:r10,by:by,bt:bt,bs:bs,cs:cs,a:a,l:l,vol:vol,ml2:ml2,sel:sel,m1:m1,m2:m2,u:u,cu:cu};
+setTimeout(function(){$('loadingScreen').style.display='none';renderResults(window._CALC);},CFG.LD_DELAY);
+}
+function renderResults(d){
+$$('.card').forEach(function(p){p.classList.remove('on');});
+$('res').style.display='block';
+['d0','d1'].forEach(function(id){$(id).classList.remove('on');$(id).classList.add('dn');});
+$('l0').classList.add('dn');$('plbl').textContent='Tu simulaci\u00f3n est\u00e1 lista \u2728';
+window.scrollTo({top:0,behavior:'smooth'});
+$('rm').textContent=d.ml2;
+$('rs').textContent=d.cs>1?'Para '+d.cs+' espacios \u00b7 '+d.bs.toLocaleString('es-CO')+' BTU/espacio':'Para tu espacio de '+(d.a*d.l).toFixed(1)+' m\u00b2 \u00b7 '+d.vol.toFixed(1)+' m\u00b3';
+$('rb').textContent='\u26a1 BTU requeridos: '+d.bt.toLocaleString('es-CO');
+var mal=$('rma');
+if(d.sel.combo){mal.style.display='block';mal.innerHTML='<strong>Configuraci\u00f3n combinada:</strong> Tu espacio requiere '+d.bt.toLocaleString('es-CO')+' BTU. Recomendamos <strong>'+d.u+'\u00d7 '+d.m1.lb+' + '+d.cu+'\u00d7 '+AC[d.sel.ck].lb+'</strong>. Un asesor te orientar\u00e1.';}
+else mal.style.display='none';
+$('ra').textContent=cop(Math.max(0,d.aea));
+$('ra2').textContent='Aprox. '+cop(Math.max(0,Math.round(d.aem)))+' menos al mes';
+$('rv').textContent=cop(d.spT);$('rv2').textContent='Incluye equipo, sistema DC e instalaci\u00f3n estimada \u00b7 sujeto a visita t\u00e9cnica obligatoria';
+$('rp').textContent=d.pb<10?d.pb.toFixed(1):'>10';
+$('rp2').textContent=d.pb<10?(d.by?'Con inflaci\u00f3n energ\u00e9tica, se recupera en el a\u00f1o '+d.by:'A partir del a\u00f1o '+Math.ceil(d.pb)+' es ganancia neta'):'Considera mayor uso en horas solares';
+$('cvs').textContent=cop(d.isT);$('cvc').textContent=cop(d.icsT);
+$('cis').textContent=cop(d.ipT);$('cic').textContent=cop(d.ipcT);
+$('cps').textContent=cop(d.spT);$('cpc').textContent=cop(d.cpT);
+$('ccs').textContent=Math.round(d.gm)+' kWh/mes';$('ccc').textContent=Math.round(d.cm)+' kWh/mes';
+$('ces').textContent=cop(Math.round(d.csm));$('cec').textContent=cop(Math.round(d.ccm));
+$('cas').textContent=cop(Math.round(d.csm*12));$('cac').textContent=cop(Math.round(d.ccm*12));
+$('cms').textContent=cop(d.msT)+' / a\u00f1o';$('cmc').textContent=cop(d.mcT)+' / a\u00f1o';
+window._RES={modelo:d.ml2,btu:'BTU: '+d.bt.toLocaleString('es-CO'),ahorro:cop(Math.max(0,d.aea)),payback:(d.pb<10?d.pb.toFixed(1):'>10')+' a\u00f1os',ret10:(d.r10>=0?'':'-')+cop(Math.abs(d.r10)),tarifa:'$'+tar.toLocaleString('es-CO')+'/kWh',
+// Desglose solar (tecnología seleccionada)
+valSistema:cop(d.isT),valInstalacion:cop(d.ipT),inversionTotal:cop(d.spT),
+// Desglose convencional (referencia comparativa)
+valSistemaConv:cop(d.icsT),valInstalacionConv:cop(d.ipcT),inversionTotalConv:cop(d.cpT),
+// Trazabilidad de la llave usada
+capacidadKey:d.sel.k,tecnologiaKey:'sol'};
+}
+function sst(m,c){var e=$('lfs');e.textContent=m;e.className=c;}
+function ssv(d){
+if(SWURL.indexOf('TU_SCRIPT')>-1)return;
+var r=window._RES||{},c=window._CALC||{};
+var ucEl=document.querySelector('#usoGrid .ch.on'),hcEl=document.querySelector('#horGrid .ch.on');
+var depEl=$('dep'),depTxt=depEl.options[depEl.selectedIndex]?depEl.options[depEl.selectedIndex].text:'';
+var p={timestamp:new Date().toLocaleString('es-CO',{timeZone:'America/Bogota'}),nombre:d.n,telefono:d.t,email:d.e,
+ancho_m:$('ancho').value||'',largo_m:$('largo').value||'',alto_m:$('alto').value||'',
+area_m2:(c.a&&c.l)?(c.a*c.l).toFixed(1):'',volumen_m3:c.vol?c.vol.toFixed(1):'',
+tipo_uso:ucEl?ucEl.querySelector('.nm').textContent.trim():'',
+personas:$('per').value||'',equipos:$('equ').value||'',aislamiento_aberturas:$('abe').value||'',
+num_espacios:$('cnt').value||'1',horario_uso:hcEl?hcEl.querySelector('.nm').textContent.trim():'',
+ubicacion:depTxt,tarifa:r.tarifa||'',
+modelo:r.modelo||'',btu:r.btu||'',
+valor_sistema:r.valSistema||'',valor_instalacion:r.valInstalacion||'',inversion_total:r.inversionTotal||'',
+valor_sistema_conv:r.valSistemaConv||'',valor_instalacion_conv:r.valInstalacionConv||'',inversion_total_conv:r.inversionTotalConv||'',
+capacidad_key:r.capacidadKey||'',tecnologia_key:r.tecnologiaKey||'',
+ahorro_anual:r.ahorro||'',payback:r.payback||'',retorno_10y:r.ret10||'',
+politica_datos:'aceptada',lead_source:'sunny_air_sim'};
+fetch(SWURL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(p)}).catch(function(){});
+}
+function lwp(){
+var d={n:$('lnn').value.trim(),t:$('lnt').value.trim(),e:$('lne').value.trim()};
+if(!d.n&&!d.t){sst('Ingresa al menos tu nombre o tel\u00e9fono.','lfe');return;}
+if(!window._RES){sst('Completa la simulaci\u00f3n primero.','lfe');return;}
+// BLOQUEO OBLIGATORIO: aceptación de visita técnica / política de datos
+if(!$('lpdc').checked){$('lpd').classList.add('inv');sst('Debes aceptar la pol\u00edtica de tratamiento de datos para continuar.','lfe');return;}
+$('lpd').classList.remove('inv');
+ssv(d);var r=window._RES,c=window._CALC||{};
+// Recolección ampliada — parámetros iniciales del usuario
+var ucEl=document.querySelector('#usoGrid .ch.on'),hcEl=document.querySelector('#horGrid .ch.on');
+var usoLbl=ucEl?ucEl.querySelector('.nm').textContent.trim():'\u2013';
+var horLbl=hcEl?hcEl.querySelector('.nm').textContent.trim():'\u2013';
+var hSub=hcEl?hcEl.querySelector('.sb').textContent.trim():'';
+var anc=$('ancho').value||'\u2013',lar=$('largo').value||'\u2013',alt=$('alto').value||'\u2013';
+var per=$('per').value||'0',equ=$('equ').value||'0',abe=$('abe').value||'0';
+var depEl=$('dep'),depTxt=depEl.options[depEl.selectedIndex]?depEl.options[depEl.selectedIndex].text:'\u2013';
+var nEsp=$('cnt').value||'1',m2t=(c.a&&c.l)?(c.a*c.l).toFixed(1):'\u2013',m3t=c.vol?c.vol.toFixed(1):'\u2013';
+var msg=encodeURIComponent(
+'Hola Ingesolar! Acab\u00e9 mi simulaci\u00f3n de ahorro solar.\n\n'+
+'*\uD83D\uDCD0 Mi espacio:*\n'+
+'\u2022 Dimensiones: '+anc+'m \u00d7 '+lar+'m \u00d7 '+alt+'m alto\n'+
+'\u2022 \u00c1rea: '+m2t+' m\u00b2 \u00b7 Volumen: '+m3t+' m\u00b3\n'+
+'\u2022 Tipo de uso: '+usoLbl+'\n'+
+'\u2022 Personas habituales: '+per+'\n'+
+'\u2022 Equipos electr\u00f3nicos: '+equ+'\n'+
+'\u2022 Ventanas/Puertas (aislamiento): '+abe+'\n'+
+'\u2022 N\u00famero de espacios: '+nEsp+'\n'+
+'\u2022 Horario de uso: '+horLbl+(hSub?' ('+hSub+')':'')+'\n'+
+'\u2022 Ubicaci\u00f3n: '+depTxt+'\n'+
+'\u2022 Tarifa OR: '+r.tarifa+'\n\n'+
+'*\u26A1 Equipo sugerido:*\n'+
+'\u2022 Modelo: '+r.modelo+'\n'+
+'\u2022 '+r.btu+'\n\n'+
+'*\uD83D\uDCB0 Inversi\u00f3n estimada (Solar):*\n'+
+'\u2022 Costo del equipo: '+r.valSistema+'\n'+
+'\u2022 Mano de obra (instalaci\u00f3n): '+r.valInstalacion+'\n'+
+'\u2022 Inversi\u00f3n total: '+r.inversionTotal+'\n\n'+
+'*\uD83D\uDCCA Referencia vs. Convencional:*\n'+
+'\u2022 Costo del equipo conv.: '+r.valSistemaConv+'\n'+
+'\u2022 Mano de obra conv.: '+r.valInstalacionConv+'\n'+
+'\u2022 Inversi\u00f3n total conv.: '+r.inversionTotalConv+'\n\n'+
+'*\uD83D\uDCC8 Proyecci\u00f3n financiera:*\n'+
+'\u2022 Ahorro anual: '+r.ahorro+'\n'+
+'\u2022 Payback: '+r.payback+'\n'+
+'\u2022 Retorno a 10 a\u00f1os: '+r.ret10+'\n\n'+
+'*\uD83D\uDC64 Mis datos:*\n'+
+(d.n?'\u2022 Nombre: '+d.n+'\n':'')+
+(d.t?'\u2022 Tel\u00e9fono: '+d.t+'\n':'')+
+(d.e?'\u2022 Correo: '+d.e+'\n':'')+
+'\n\u2705 Acepto la pol\u00edtica de tratamiento de datos y autorizo el contacto.\n\n'+
+'Quisiera agendar la visita t\u00e9cnica obligatoria y recibir mi cotizaci\u00f3n formal. Gracias.'
+);
+window.open(window._WB+'?text='+msg,'_blank');
+sst('\u2714 WhatsApp abierto con tu resumen completo. \u00a1Nos vemos all\u00e1!','lfo');
+}
+var fabOp=false;
+function tf(){
+fabOp=!fabOp;$('fabp').classList.toggle('op',fabOp);
+var b=$('fabm');b.classList.toggle('op',fabOp);b.innerHTML=fabOp?'&times;':'&#128172;';
+if(fabOp)$('fbd').style.display='none';
+}
+function rst(){
+var hd=document.querySelector('header');if(hd)hd.style.display='flex';
+var hr=document.querySelector('.hero');if(hr)hr.style.display='block';
+var pn=document.querySelector('.pnav');if(pn)pn.style.top='64px';
+uf=null;mf=CFG.MF_DIA;tar=CFG.TAR_DEFAULT;window._RES=null;window._CALC=null;
+['ancho','largo','alto'].forEach(function(id){$(id).value='';});
+['per','equ','abe'].forEach(function(id,i){$(id).value=[2,1,2][i];});
+$('dep').value='';$('tbx').style.display='none';$('pvw').classList.remove('show');$('cnt').value=1;
+['lnn','lnt','lne'].forEach(function(id){$(id).value='';});
+$('lpdc').checked=false;$('lpd').classList.remove('inv');
+$('lfs').textContent='';
+$$('#usoGrid .ch').forEach(function(c){c.classList.remove('on');});
+$$('#horGrid .ch').forEach(function(c){c.classList.remove('on');});
+document.querySelector('#horGrid .ch').classList.add('on');
+['fa','fl','fh','fdp'].forEach(function(id){$(id).classList.remove('inv');});
+$('usoGrid').classList.remove('inv');$('res').style.display='none';
+$('simMain').style.display='none';$('techIntro').style.display='block';$('featSection').style.display='block';
+$$('[onclick="startSim()"]').forEach(function(b){b.style.display='';});
+var d0=$('d0'),d1=$('d1'),l0=$('l0');
+d0.classList.remove('on','dn');d1.classList.remove('on','dn');l0.classList.remove('dn');d0.classList.add('on');
+$('plbl').textContent='Primero, conoce c\u00f3mo funciona';
+window.scrollTo({top:0,behavior:'smooth'});goStep(0);
+}
+function cop(n){return'$'+Math.round(n).toLocaleString('es-CO');}
+$('tsl').addEventListener('input',function(){usb(this);});
+</script>
+</body>
+</html>
