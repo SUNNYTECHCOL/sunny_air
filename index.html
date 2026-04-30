@@ -22,15 +22,15 @@ header{background:var(--k);padding:0 24px;height:64px;display:flex;align-items:c
 .logo-img{height:40px;object-fit:contain}
 .hcta{display:flex;align-items:center;gap:8px;background:var(--s);color:var(--k);border:none;border-radius:24px;padding:10px 20px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;letter-spacing:.2px}
 .hcta:hover{background:var(--sd);transform:translateY(-1px)}
-.hero{background:var(--k);padding:40px 24px 0;text-align:center;position:relative;overflow:hidden}
+.hero{background:var(--k);padding:40px 24px 36px;text-align:center;position:relative;overflow:hidden}
 .hero::before{content:"";position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,var(--s18) 0%,transparent 70%);pointer-events:none}
 .hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--sm);border:1px solid var(--s3);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--s);letter-spacing:.4px;margin-bottom:16px}
 .hero h1{font-family:"Libre Baskerville",serif;font-size:clamp(22px,5vw,34px);color:var(--w);line-height:1.2;margin-bottom:12px;position:relative;max-width:520px;margin-left:auto;margin-right:auto}
 .hero h1 span{color:var(--s)}
-.hero-sub{font-size:15px;color:var(--g3);line-height:1.6;max-width:440px;margin:0 auto 32px;position:relative}
-.iso-wrap{position:relative;max-width:700px;margin:0 auto;overflow:hidden}
-.iso-wrap img{width:100%;display:block;object-fit:cover;border-radius:16px 16px 0 0;filter:drop-shadow(0 -20px 60px rgba(0,0,0,.5))}
-.iso-overlay{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to top,var(--k),transparent)}
+.hero-sub{font-size:15px;color:var(--g3);line-height:1.6;max-width:440px;margin:0 auto;position:relative}
+.iso-band{background:var(--g1);padding:32px 16px 8px}
+.iso-wrap{position:relative;max-width:700px;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.08)}
+.iso-wrap img{width:100%;display:block;object-fit:cover}
 .pnav{background:var(--k2);border-bottom:1px solid var(--k4);padding:14px 24px;position:sticky;top:64px;z-index:200}
 .pnav-inner{display:flex;align-items:center;justify-content:center;gap:0;max-width:360px;margin:0 auto}
 .pdot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:var(--k4);color:var(--g3);border:2px solid var(--k4);flex-shrink:0;transition:all .3s}
@@ -42,6 +42,10 @@ header{background:var(--k);padding:0 24px;height:64px;display:flex;align-items:c
 .pln.dn{background:var(--sd)}
 .pnav-lbl{text-align:center;font-size:12px;color:var(--g3);margin-top:8px;letter-spacing:.3px}
 .tintro{max-width:660px;margin:0 auto;padding:28px 16px 0}
+.tintro-greet{padding:4px 4px 24px;text-align:center}
+.tintro-eyebrow{display:inline-block;background:var(--sm);color:var(--s);font-size:11px;font-weight:700;letter-spacing:.6px;padding:4px 12px;border-radius:12px;margin-bottom:14px}
+.tintro-hello{font-family:"Libre Baskerville",serif;font-size:clamp(20px,4.5vw,26px);color:var(--k);line-height:1.25;margin-bottom:8px}
+.tintro-helpsub{font-size:13.5px;color:var(--g4);line-height:1.6;max-width:480px;margin:0 auto}
 .tintro-card{background:var(--k);border-radius:var(--r);overflow:hidden;margin-bottom:20px;box-shadow:0 4px 24px rgba(0,0,0,.12)}
 .tintro-head{padding:22px 22px 0}
 .tintro-tag{display:inline-block;background:var(--sm);color:var(--s);font-size:11px;font-weight:700;letter-spacing:.6px;padding:4px 12px;border-radius:12px;margin-bottom:12px}
@@ -237,22 +241,29 @@ header{padding:0 16px}main,.tintro,.feat-section{padding-left:12px;padding-right
 <div class="hero-badge">&#x2600;&#xFE0F; Tecnolog&iacute;a h&iacute;brida AC/DC</div>
 <h1>Tener confort t&eacute;rmico en tu hogar o empresa no deber&iacute;a disparar tu factura</h1>
 <p class="hero-sub">Deja que el Sol pague por ti</p>
+</div>
+<!-- ISO BAND (esquema sobre fondo claro, separado del hero) -->
+<div class="iso-band">
 <div class="iso-wrap">
 <img src="https://www.ingesolar.com.co/wp-content/uploads/2026/04/ingesolar-esquema-aire-acondicionado-solar-hibrido-1600.webp" alt="Sistema de aire solar instalado en local comercial">
-<div class="iso-overlay"></div>
 </div>
 </div>
-<!-- PROGRESS -->
-<div class="pnav">
+<!-- PROGRESS (oculto hasta iniciar la simulaci\u00f3n) -->
+<div class="pnav" style="display:none">
 <div class="pnav-inner">
 <div class="pdot on" id="d0"><span>1</span></div>
 <div class="pln" id="l0"></div>
 <div class="pdot" id="d1"><span>2</span></div>
 </div>
-<div class="pnav-lbl" id="plbl">Antes de simular &mdash; conoce la tecnolog&iacute;a</div>
+<div class="pnav-lbl" id="plbl">Paso 1 de 2 &mdash; Tu espacio</div>
 </div>
 <!-- TECH INTRO -->
 <div class="tintro" id="techIntro">
+<div class="tintro-greet">
+<div class="tintro-eyebrow">&#x1F44B; ANTES DE SIMULAR</div>
+<div class="tintro-hello">Conoce c&oacute;mo funciona tu sistema</div>
+<div class="tintro-helpsub">Entiende la tecnolog&iacute;a en 30 segundos para que tu simulaci&oacute;n tenga sentido.</div>
+</div>
 <div class="tintro-card">
 <div class="tintro-head">
 <div class="tintro-tag">&#x1F50D; C&Oacute;MO FUNCIONA</div>
@@ -595,18 +606,21 @@ var AC=CFG.AC;
 var uf=null,mf=CFG.MF_DIA,tar=CFG.TAR_DEFAULT;
 function startSim(){
 var h=document.querySelector('.hero');if(h)h.style.display='none';
+var ib=document.querySelector('.iso-band');if(ib)ib.style.display='none';
 $('techIntro').style.display='none';$('featSection').style.display='none';
 $$('[onclick="startSim()"]').forEach(function(b){b.style.display='none';});
-var p=document.querySelector('.pnav');if(p)p.style.top='64px';
+var p=document.querySelector('.pnav');if(p){p.style.display='';p.style.top='64px';}
 $('simMain').style.display='block';$('plbl').textContent='Paso 1 de 2 \u2014 Tu espacio';
 window.scrollTo({top:0,behavior:'smooth'});
 }
 function goHome(){
 var h=document.querySelector('.hero');if(h)h.style.display='block';
+var ib=document.querySelector('.iso-band');if(ib)ib.style.display='';
 $('techIntro').style.display='block';$('featSection').style.display='block';
 $$('[onclick="startSim()"]').forEach(function(b){b.style.display='';});
 $('simMain').style.display='none';$('res').style.display='none';
-$('plbl').textContent='Antes de simular \u2014 conoce la tecnolog\u00eda';
+var p=document.querySelector('.pnav');if(p)p.style.display='none';
+$('plbl').textContent='Paso 1 de 2 \u2014 Tu espacio';
 var d0=$('d0'),d1=$('d1'),l0=$('l0');
 d0.classList.remove('on','dn');d1.classList.remove('on','dn');l0.classList.remove('dn');d0.classList.add('on');
 window.scrollTo({top:0,behavior:'smooth'});
@@ -869,7 +883,8 @@ if(fabOp)$('fbd').style.display='none';
 function rst(){
 var hd=document.querySelector('header');if(hd)hd.style.display='flex';
 var hr=document.querySelector('.hero');if(hr)hr.style.display='block';
-var pn=document.querySelector('.pnav');if(pn)pn.style.top='64px';
+var ib=document.querySelector('.iso-band');if(ib)ib.style.display='';
+var pn=document.querySelector('.pnav');if(pn){pn.style.display='none';pn.style.top='64px';}
 uf=null;mf=CFG.MF_DIA;tar=CFG.TAR_DEFAULT;window._RES=null;window._CALC=null;
 ['ancho','largo','alto'].forEach(function(id){$(id).value='';});
 ['per','equ','abe'].forEach(function(id,i){$(id).value=[2,1,2][i];});
@@ -886,7 +901,7 @@ $('simMain').style.display='none';$('techIntro').style.display='block';$('featSe
 $$('[onclick="startSim()"]').forEach(function(b){b.style.display='';});
 var d0=$('d0'),d1=$('d1'),l0=$('l0');
 d0.classList.remove('on','dn');d1.classList.remove('on','dn');l0.classList.remove('dn');d0.classList.add('on');
-$('plbl').textContent='Primero, conoce c\u00f3mo funciona';
+$('plbl').textContent='Paso 1 de 2 \u2014 Tu espacio';
 window.scrollTo({top:0,behavior:'smooth'});goStep(0);
 }
 function cop(n){return'$'+Math.round(n).toLocaleString('es-CO');}
