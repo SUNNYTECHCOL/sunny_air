@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Simulador de ahorro con aire acondicionado solar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--k:#0A0A0A;--k2:#111111;--k3:#1A1A1A;--k4:#252525;
+--s:#F5C03A;--sd:#D4A020;--sm:rgba(245,192,58,.12);--sb:rgba(245,192,58,.06);
+--g:#4E9A57;--gl:#EAF5EC;
+--w:#FFFFFF;--g1:#F7F6F2;--g2:#E6E5E0;--g3:#AEADA7;--g4:#6E6D67;
+--er:#D94040;--r:16px;--rs:10px;
+--s3:rgba(245,192,58,.3);--s18:rgba(245,192,58,.18);--w06:rgba(255,255,255,.06);
+}
+html{scroll-behavior:smooth}
+body{font-family:"DM Sans",system-ui,sans-serif;background:var(--g1);color:var(--k);-webkit-font-smoothing:antialiased}
+header{background:var(--k);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;box-shadow:0 1px 0 var(--w06)}
+.logo-img{height:40px;object-fit:contain}
+.hcta{display:flex;align-items:center;gap:8px;background:var(--s);color:var(--k);border:none;border-radius:24px;padding:10px 20px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;letter-spacing:.2px}
+.hcta:hover{background:var(--sd);transform:translateY(-1px)}
+.hero{background:var(--k);padding:40px 24px 36px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,var(--s18) 0%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--sm);border:1px solid var(--s3);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--s);letter-spacing:.4px;margin-bottom:16px}
+.hero h1{font-family:"Libre Baskerville",serif;font-size:clamp(22px,5vw,34px);color:var(--w);line-height:1.2;margin-bottom:12px;position:relative;max-width:520px;margin-left:auto;margin-right:auto}
+.hero h1 span{color:var(--s)}
+.hero-sub{font-size:15px;color:var(--g3);line-height:1.6;max-width:440px;margin:0 auto;position:relative}
+.iso-band{background:var(--g1);padding:32px 16px 8px}
+.iso-wrap{position:relative;max-width:700px;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.08)}
+.iso-wrap img{width:100%;display:block;object-fit:cover}
+.pnav{background:var(--k2);border-bottom:1px solid var(--k4);padding:14px 24px;position:sticky;top:64px;z-index:200}
+.pnav-inner{display:flex;align-items:center;justify-content:center;gap:0;max-width:360px;margin:0 auto}
+.pdot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:var(--k4);color:var(--g3);border:2px solid var(--k4);flex-shrink:0;transition:all .3s}
+.pdot.on{background:var(--s);border-color:var(--s);color:var(--k)}
+.pdot.dn{background:var(--sd);border-color:var(--sd);color:var(--k)}
+.pdot.dn span{display:none}
+.pdot.dn::after{content:"✓";font-size:15px}
+.pln{flex:1;height:2px;background:var(--k4);max-width:90px;transition:background .3s}
+.pln.dn{background:var(--sd)}
+.pnav-lbl{text-align:center;font-size:12px;color:var(--g3);margin-top:8px;letter-spacing:.3px}
+.tintro{max-width:660px;margin:0 auto;padding:28px 16px 0}
+.tintro-greet{padding:4px 4px 24px;text-align:center}
+.tintro-eyebrow{display:inline-block;background:var(--sm);color:var(--s);font-size:11px;font-weight:700;letter-spacing:.6px;padding:4px 12px;border-radius:12px;margin-bottom:14px}
+.tintro-hello{font-family:"Libre Baskerville",serif;font-size:clamp(20px,4.5vw,26px);color:var(--k);line-height:1.25;margin-bottom:8px}
+.tintro-helpsub{font-size:13.5px;color:var(--g4);line-height:1.6;max-width:480px;margin:0 auto}
+.tintro-card{background:var(--k);border-radius:var(--r);overflow:hidden;margin-bottom:20px;box-shadow:0 4px 24px rgba(0,0,0,.12)}
+.tintro-head{padding:22px 22px 0}
+.tintro-tag{display:inline-block;background:var(--sm);color:var(--s);font-size:11px;font-weight:700;letter-spacing:.6px;padding:4px 12px;border-radius:12px;margin-bottom:12px}
+.tintro-title{font-family:"Libre Baskerville",serif;font-size:clamp(18px,4vw,22px);color:var(--w);line-height:1.3;margin-bottom:8px}
+.tintro-sub{font-size:13px;color:var(--g3);line-height:1.65;margin-bottom:18px}
+.modes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+.mode{padding:18px 16px 20px;border-top:1px solid var(--w06);position:relative;cursor:default}
+.mode:not(:last-child){border-right:1px solid var(--w06)}
+.mode.m1{background:linear-gradient(160deg,#1a1a00,#0A0A0A)}
+.mode.m2{background:#0A0A0A}
+.mode.m3{background:linear-gradient(160deg,#0a0a1a,#0A0A0A)}
+.mode-chip{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:8px;margin-bottom:10px}
+.mode.m1 .mode-chip{background:var(--s18);color:var(--s)}
+.mode.m2 .mode-chip{background:rgba(78,154,87,.18);color:#6FC677}
+.mode.m3 .mode-chip{background:rgba(136,153,255,.18);color:#8899FF}
+.mode-ic{font-size:30px;display:block;margin-bottom:10px}
+.mode-nm{font-size:13px;font-weight:700;color:var(--w);margin-bottom:6px;line-height:1.3}
+.mode-desc{font-size:11px;color:var(--g3);line-height:1.55}
+.install-strip{display:flex;align-items:center;gap:16px;padding:18px 22px;background:var(--sb);border-top:1px solid rgba(245,192,58,.12)}
+.install-ic{font-size:28px;flex-shrink:0}
+.install-text strong{display:block;font-size:14px;font-weight:700;color:var(--w);margin-bottom:2px}
+.install-text span{font-size:12px;color:var(--g3);line-height:1.5}
+.feat-section{max-width:660px;margin:0 auto;padding:0 16px 20px}
+.feat-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--g4);margin-bottom:12px;padding-left:2px}
+.feat-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fc{background:var(--w);border:1.5px solid var(--g2);border-radius:12px;padding:16px 14px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.fc::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0;opacity:0;transition:opacity .2s}
+.fc:hover{border-color:var(--sd);transform:translateY(-2px)}
+.fc:hover::before{opacity:1;background:var(--s)}
+.fc.accent{border-color:rgba(245,192,58,.35);background:linear-gradient(135deg,#fffdf0,var(--w))}
+.fc.accent::before{background:var(--s);opacity:1}
+.fc.wide{grid-column:1/-1}
+.fc-ic{font-size:26px;margin-bottom:8px}
+.fc-title{font-size:13px;font-weight:700;color:var(--k);margin-bottom:4px;line-height:1.3}
+.fc-sub{font-size:12px;color:var(--g4);line-height:1.55}
+.fc-tag{display:inline-block;background:var(--sm);color:var(--sd);font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;margin-top:6px}
+main{max-width:660px;margin:0 auto;padding:0 16px 100px}
+.sim-divider{display:flex;align-items:center;gap:12px;padding:24px 0 16px}
+.sim-divider-line{flex:1;height:1px;background:var(--g2)}
+.sim-divider-txt{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--g4);white-space:nowrap}
+.bhome{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1.5px solid var(--g2);color:var(--g4);padding:9px 14px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:14px;transition:all .15s;letter-spacing:.2px}
+.bhome:hover{border-color:var(--sd);color:var(--k);background:var(--sb)}
+.bhome:active{transform:scale(.97)}
+.card{background:var(--w);border-radius:var(--r);padding:24px 22px;box-shadow:0 1px 8px rgba(0,0,0,.07);display:none;animation:fu .25s ease;border:1.5px solid var(--g2)}
+.card.on{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.slb{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--g4);margin-bottom:12px;padding-bottom:7px;border-bottom:1.5px solid var(--g2);display:flex;align-items:center;gap:6px}
+.fg{display:grid;gap:12px;margin-bottom:18px}
+.c3{grid-template-columns:1fr 1fr 1fr}.c2{grid-template-columns:1fr 1fr}.c1{grid-template-columns:1fr}
+.fl label{display:block;font-size:11px;font-weight:700;color:var(--g4);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.fl input,.fl select{width:100%;padding:12px 14px;border:1.5px solid var(--g2);border-radius:var(--rs);font-family:inherit;font-size:15px;color:var(--k);background:var(--w);appearance:none;-webkit-appearance:none;-moz-appearance:none;transition:border-color .15s,box-shadow .15s;outline:none}
+.fl input:focus,.fl select:focus{border-color:var(--sd);box-shadow:0 0 0 3px rgba(245,192,58,.2)}
+.fl.inv input,.fl.inv select{border-color:var(--er)}
+.fl.inv .em{display:block}
+.em{font-size:11px;color:var(--er);margin-top:4px;display:none}
+.pvw{display:none;background:var(--sb);border:1.5px solid var(--s3);border-radius:var(--rs);padding:11px 14px;gap:18px;flex-wrap:wrap;font-size:13px;font-weight:600;color:var(--k);margin-bottom:14px}
+.pvw.show{display:flex}
+.chg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.ch{border:2px solid var(--g2);border-radius:10px;padding:13px 8px;cursor:pointer;text-align:center;transition:all .15s;background:var(--w);-webkit-tap-highlight-color:transparent;user-select:none}
+.ch:active{transform:scale(.97)}
+.ch.on{border-color:var(--sd);background:var(--sm);box-shadow:0 0 0 4px rgba(245,192,58,.12)}
+.ch .ic{font-size:22px;margin-bottom:5px}
+.ch .nm{font-size:12px;font-weight:700;line-height:1.25;color:var(--k)}
+.ch .tg{display:inline-block;background:var(--sm);color:var(--sd);font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;margin-top:4px}
+.chg.inv .ch{border-color:var(--er)}.chg.inv+.em{display:block}
+.ch.sc .ic{font-size:20px;margin-bottom:4px}
+.ch .sb{font-size:10px;color:var(--g4);margin-top:3px;line-height:1.35}
+/* Tarjeta de tarifa estimada */
+.tcard{background:var(--g1);border-left:4px solid var(--s);border-radius:var(--rs);padding:14px 16px;margin-bottom:14px;display:none;justify-content:space-between;align-items:center;gap:12px}
+.tcard.on{display:flex}
+.tcard-l{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.tcard-lbl{font-size:11px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.4px}
+.tcard-src{font-size:11px;color:var(--g4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcard-r{text-align:right;flex-shrink:0}
+.tcard-val{font-size:24px;font-weight:800;color:var(--k);line-height:1}
+.tcard-k{font-size:11px;color:var(--g4);margin-top:2px}
+/* Checkbox tarifa manual */
+.mtw{display:none;align-items:flex-start;gap:8px;padding:6px 0 10px;cursor:pointer;font-size:13px;color:var(--k);line-height:1.4;user-select:none;margin-bottom:6px}
+.mtw.on{display:flex}
+.mtw input[type=checkbox]{margin-top:2px;flex-shrink:0;width:16px;height:16px;accent-color:var(--s);cursor:pointer}
+/* Wrapper del input manual (colapsable) */
+.mti{display:none;margin-bottom:16px;padding:14px;background:var(--sb);border:1px solid var(--s3);border-radius:var(--rs)}
+.mti.on{display:block}
+.mti label{display:block;font-size:11px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.mti input{width:100%;padding:10px 12px;border:1.5px solid var(--g2);border-radius:var(--rs);background:var(--w);font-family:inherit;font-size:15px;font-weight:600;color:var(--k);outline:none;transition:border-color .15s}
+.mti input:focus{border-color:var(--s)}
+.mti.inv input{border-color:var(--er)}
+.mti .em{display:none;font-size:11px;color:var(--er);margin-top:4px}
+.mti.inv .em{display:block}
+.mt-hint{font-size:11.5px;color:var(--g4);line-height:1.5;margin-top:10px}
+.mt-hint strong{color:var(--k)}
+.nav{display:flex;justify-content:space-between;margin-top:24px;gap:12px}
+.btn{padding:14px 26px;border-radius:10px;border:none;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;letter-spacing:.2px}
+.btn:active{transform:scale(.97)}
+.bbk{background:var(--g2);color:var(--g4);flex-shrink:0}
+.bnx{background:var(--s);color:var(--k);flex:1;box-shadow:0 4px 16px rgba(245,192,58,.3)}
+.bnx:hover{background:var(--sd);transform:translateY(-1px)}
+.bca{background:var(--k);color:var(--s);flex:1;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.bca:hover{background:var(--k3);transform:translateY(-1px)}
+#loadingScreen{display:none;position:fixed;inset:0;background:var(--k);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:24px}
+.ld-logo{height:44px;object-fit:contain;animation:ldpulse 1.5s ease-in-out infinite}
+@keyframes ldpulse{0%,100%{opacity:.5;transform:scale(.97)}50%{opacity:1;transform:scale(1)}}
+.ld-text{font-family:"Libre Baskerville",serif;font-size:22px;color:var(--w);text-align:center;line-height:1.4}
+.ld-text span{color:var(--s)}
+.ld-bar{width:200px;height:4px;background:var(--k4);border-radius:2px;overflow:hidden}
+.ld-bar-fill{height:100%;background:linear-gradient(90deg,var(--s),var(--sd));border-radius:2px;animation:ldbar 2.8s ease-in-out forwards}
+@keyframes ldbar{0%{width:0}60%{width:75%}90%{width:90%}100%{width:100%}}
+.ld-sub{font-size:13px;color:var(--g4);text-align:center}
+.ld-steps{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.ld-step{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--g4);animation:ldstep .4s ease forwards;opacity:0}
+.ld-step:nth-child(1){animation-delay:.3s}
+.ld-step:nth-child(2){animation-delay:.8s}
+.ld-step:nth-child(3){animation-delay:1.3s}
+.ld-step .ck{width:18px;height:18px;border-radius:50%;background:var(--sm);border:1.5px solid var(--sd);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+@keyframes ldstep{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+#res{display:none}
+.rh{background:var(--k);border-radius:var(--r);padding:24px 22px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.rh::after{content:"";position:absolute;bottom:-50px;left:50%;transform:translateX(-50%);width:260px;height:100px;background:radial-gradient(ellipse,rgba(245,192,58,.22),transparent 70%);pointer-events:none}
+.rhl{font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--g3);margin-bottom:6px}
+.rhm{font-family:"Libre Baskerville",serif;font-size:clamp(22px,5vw,30px);color:var(--s);font-weight:700}
+.rhs{font-size:13px;color:var(--g3);margin-top:6px}
+.rbg{display:inline-block;background:rgba(245,192,58,.15);border:1px solid rgba(245,192,58,.4);border-radius:20px;padding:5px 16px;font-size:12px;font-weight:700;color:var(--s);margin-top:10px}
+.malert{background:#FFF8E1;border:1.5px solid #F0A020;border-radius:var(--rs);padding:13px 16px;margin-bottom:14px;font-size:13px;line-height:1.6;color:#7A5000;display:none}
+.hg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.hg3{grid-template-columns:1fr 1fr}
+.hg3 .hc.wide{grid-column:1/-1}
+.hc.wide .hval{font-size:clamp(24px,6vw,32px)}
+.hc{background:var(--w);border:1.5px solid var(--g2);border-radius:12px;padding:18px 15px}
+.hc.accent{border-color:rgba(245,192,58,.4);background:linear-gradient(135deg,#fffef5,var(--w))}
+.hic{font-size:24px;margin-bottom:7px}.hlb{font-size:11px;color:var(--g4);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;font-weight:600}
+.hval{font-size:clamp(18px,4vw,24px);font-weight:800;color:var(--k);line-height:1.1}
+.hun{font-size:11px;color:var(--g4);margin-top:3px}.htip{font-size:11px;color:var(--g4);margin-top:5px;line-height:1.45}
+.comp-wrap{background:var(--w);border:1.5px solid var(--g2);border-radius:var(--rs);overflow:hidden;margin-bottom:14px}
+.comp-tit{padding:11px 15px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g4);background:var(--g1);border-bottom:1.5px solid var(--g2)}
+table.cpt{width:100%;border-collapse:collapse}
+table.cpt th{padding:10px 13px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--g4);border-bottom:1.5px solid var(--g2)}
+table.cpt th:nth-child(2){color:var(--g);background:var(--gl)}
+table.cpt td{padding:11px 13px;font-size:13px;border-bottom:1px solid var(--g2)}
+table.cpt tr:last-child td{border-bottom:none}
+table.cpt tr.cpt-sub td{background:var(--g1);border-top:1.5px solid var(--g2);border-bottom:1.5px solid var(--g2)}
+table.cpt tr.cpt-sub td:nth-child(2){background:var(--gl)}
+table.cpt td:nth-child(2){font-weight:700;color:var(--g);background:rgba(78,154,87,.04)}
+.lw{background:var(--k);border:2px solid var(--s);border-radius:var(--r);padding:24px 22px;margin-bottom:14px;box-shadow:0 8px 32px var(--s18);position:relative;overflow:hidden}
+.lw::before{content:"";position:absolute;top:-80px;right:-80px;width:200px;height:200px;background:radial-gradient(circle,rgba(245,192,58,.15),transparent 70%);pointer-events:none}
+.lt{font-size:18px;font-weight:700;color:var(--w);margin-bottom:6px;line-height:1.3;font-family:"Libre Baskerville",serif}
+.ls{font-size:13px;color:var(--g3);line-height:1.6;margin-bottom:20px}
+.lw .fl label{color:var(--g3)}
+.lw .fl input{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:var(--w)}
+.lw .fl input::placeholder{color:rgba(255,255,255,.3)}
+.lw .fl input:focus{border-color:var(--s);background:rgba(255,255,255,.1)}
+.bwp{width:100%;background:linear-gradient(135deg,#25D366,#1aad53);color:#fff;border:none;border-radius:12px;padding:18px 16px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.2px;box-shadow:0 6px 24px rgba(37,211,102,.3);margin-top:4px}
+.bwp:hover{background:linear-gradient(135deg,#1aad53,#128C3E);transform:translateY(-2px);box-shadow:0 8px 28px rgba(37,211,102,.4)}
+.bwp:active{transform:scale(.98)}
+.bwp-ic{font-size:20px}
+#lfs{font-size:13px;min-height:20px;margin-top:10px}
+.lfo{color:#6FC677;font-weight:700}.lfe{color:#FF7070;font-weight:700}
+.lpd{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:rgba(255,255,255,.75);line-height:1.55;margin:14px 0 6px;cursor:pointer;padding:12px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);transition:border-color .15s,background .15s}
+.lpd:hover{background:rgba(255,255,255,.06);border-color:rgba(245,192,58,.25)}
+.lpd input[type=checkbox]{flex-shrink:0;width:18px;height:18px;margin-top:1px;accent-color:var(--s);cursor:pointer}
+.lpd a{color:var(--s);text-decoration:underline;font-weight:600}
+.lpd a:hover{color:var(--sd)}
+.lpd.inv{border-color:var(--er);background:rgba(217,64,64,.08)}
+.lnot{font-size:11px;color:rgba(255,255,255,.3);margin-top:10px;line-height:1.55}
+.brs{background:none;border:1.5px solid var(--g2);color:var(--g4);padding:13px 20px;border-radius:10px;font-family:inherit;font-size:14px;cursor:pointer;width:100%;margin-top:10px;transition:all .15s;letter-spacing:.2px}
+.brs:hover{border-color:var(--g3);color:var(--k)}
+.fd{font-size:11px;color:var(--g4);line-height:1.7;padding:14px 4px 24px;border-top:1px solid var(--g2)}
+footer{background:var(--k);padding:16px 24px;text-align:center;font-size:12px;color:var(--g4);line-height:1.8}
+@media(max-width:440px){
+.fg.c3{grid-template-columns:1fr 1fr}.chg{grid-template-columns:1fr 1fr}
+.hg{grid-template-columns:1fr 1fr}.feat-cards{grid-template-columns:1fr 1fr}.modes{grid-template-columns:1fr}
+.mode:not(:last-child){border-right:none;border-bottom:1px solid var(--w06)}
+header{padding:0 16px}main,.tintro,.feat-section{padding-left:12px;padding-right:12px}
+}
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<header>
+<img src="https://www.ingesolar.com.co/wp-content/uploads/2026/05/Gemini_Generated_Image_ebyd4yebyd4yebyd.png" class="logo-img" alt="Logo">
+</header>
+<!-- LOADING -->
+<div id="loadingScreen">
+<img src="https://www.ingesolar.com.co/wp-content/uploads/2026/05/Gemini_Generated_Image_ebyd4yebyd4yebyd.png" class="ld-logo" alt="Logo">
+<div class="ld-text">Construyendo tu <span>simulaci&oacute;n solar</span>...</div>
+<div class="ld-bar"><div class="ld-bar-fill"></div></div>
+<div class="ld-steps">
+<div class="ld-step"><div class="ck">&#x2714;</div><span>Midiendo tu espacio y calculando BTU necesarios</span></div>
+<div class="ld-step"><div class="ck">&#x2714;</div><span>Seleccionando el modelo &oacute;ptimo para tu caso</span></div>
+<div class="ld-step"><div class="ck">&#x2714;</div><span>Calculando tu ahorro mensual y retorno de inversi&oacute;n</span></div>
+</div>
+</div>
+<!-- HERO -->
+<div class="hero">
+<div class="hero-badge">&#x2600;&#xFE0F; Aire Solar h&iacute;brido AC/DC</div>
+<h1>Tener confort t&eacute;rmico en tu hogar o empresa no deber&iacute;a disparar tu factura</h1>
+<p class="hero-sub">Deja que el Sol pague por ti</p>
+</div>
+<!-- ISO BAND (esquema sobre fondo claro, separado del hero) -->
+<div class="iso-band">
+<div class="iso-wrap">
+<img src="https://www.ingesolar.com.co/wp-content/uploads/2026/04/ingesolar-esquema-aire-acondicionado-solar-hibrido-1600.webp" alt="Sistema de aire solar instalado en local comercial">
+</div>
+</div>
+<!-- PROGRESS (oculto hasta iniciar la simulaci\u00f3n) -->
+<div class="pnav" style="display:none">
+<div class="pnav-inner">
+<div class="pdot on" id="d0"><span>1</span></div>
+<div class="pln" id="l0"></div>
+<div class="pdot" id="d1"><span>2</span></div>
+</div>
+<div class="pnav-lbl" id="plbl">Paso 1 de 2 &mdash; Tu espacio</div>
+</div>
+<!-- TECH INTRO -->
+<div class="tintro" id="techIntro">
+<div class="tintro-greet">
+<div class="tintro-eyebrow">&#x1F44B; ANTES DE SIMULAR</div>
+<div class="tintro-hello">Conoce c&oacute;mo funciona tu sistema</div>
+<div class="tintro-helpsub">Entiende la tecnolog&iacute;a en 30 segundos para que tu simulaci&oacute;n tenga sentido.</div>
+</div>
+<div class="tintro-card">
+<div class="tintro-head">
+<div class="tintro-tag">&#x1F50D; C&Oacute;MO FUNCIONA</div>
+<div class="tintro-title">Aire acondicionado solar h&iacute;brido con aprovechamiento solar directo</div>
+<div class="tintro-sub">El sistema prioriza energ&iacute;a solar durante el d&iacute;a y toma apoyo de la red cuando es necesario.</div>
+</div>
+<div class="modes">
+<div class="mode m1">
+<span class="mode-chip">D&Iacute;A SOLEADO</span><span class="mode-ic">&#x2600;&#xFE0F;</span>
+<div class="mode-nm">M&aacute;ximo aprovechamiento solar</div>
+<div class="mode-desc">Durante las horas de mayor radiaci&oacute;n, el equipo aprovecha al m&aacute;ximo la energ&iacute;a proveniente de los paneles.</div>
+</div>
+<div class="mode m2">
+<span class="mode-chip">D&Iacute;A PARCIALMENTE NUBLADO</span><span class="mode-ic">&#x26C5;&#xFE0F;</span>
+<div class="mode-nm">Prioriza solar y complementa con red</div>
+<div class="mode-desc">Cuando la radiaci&oacute;n disminuye, el sistema mantiene el aporte solar y toma respaldo de la red para sostener la operaci&oacute;n.</div>
+</div>
+<div class="mode m3">
+<span class="mode-chip">NOCHE</span><span class="mode-ic">&#x1F319;</span>
+<div class="mode-nm">Opera con energ&iacute;a de la red manteniendo eficiencia</div>
+<div class="mode-desc">En ausencia de radiaci&oacute;n solar, el equipo trabaja con energ&iacute;a de la red con la eficiencia propia de su tecnolog&iacute;a inverter.</div>
+</div>
+</div>
+<div class="install-strip">
+<div class="install-ic">&#x1F527;</div>
+<div class="install-text">
+<strong>Instalaci&oacute;n simplificada, sin bater&iacute;as</strong>
+<span>La unidad interior se comunica con la unidad exterior, y la unidad exterior recibe tanto la alimentaci&oacute;n de los paneles como el respaldo de la red para gestionar el funcionamiento del sistema.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- FEATURES -->
+<div class="feat-section" id="featSection">
+<div class="feat-section-title">&#x2728; Por qu&eacute; este equipo es diferente a cualquier aire que ya conoces</div>
+<p style="font-size:13px;color:var(--g4);line-height:1.6;margin:0 0 12px 2px">No es un aire convencional ni un inverter com&uacute;n: es un sistema h&iacute;brido dise&ntilde;ado para aprovechar energ&iacute;a solar de forma directa.</p>
+<div class="feat-cards">
+<div class="fc accent wide"><div class="fc-ic">&#x2744;&#xFE0F;&#x1F525;</div><div class="fc-title">Fr&iacute;o y calor con ajuste autom&aacute;tico</div><div class="fc-sub">El equipo acondiciona el espacio autom&aacute;ticamente, enfriando o calefaccionando seg&uacute;n la necesidad.</div><span class="fc-tag">CALEFACCI&Oacute;N + REFRIGERACI&Oacute;N</span></div>
+<div class="fc"><div class="fc-ic">&#x1F4F1;</div><div class="fc-title">Control por app</div><div class="fc-sub">Configura temperatura, monitorea el funcionamiento y gestiona el equipo desde tu celular.</div></div>
+<div class="fc"><div class="fc-ic">&#x1F33F;</div><div class="fc-title">Refrigerante R410A ecol&oacute;gico</div><div class="fc-sub">No inflamable y de menor impacto ambiental. Impulsado por un compresor DC para mayor eficiencia y vida &uacute;til.</div></div>
+</div>
+</div>
+<!-- CTA -->
+<div style="max-width:660px;margin:0 auto;padding:0 16px 24px">
+<button class="btn bnx" style="width:100%;font-size:16px;padding:18px;border-radius:12px;letter-spacing:.3px" onclick="startSim()">&#x26A1; Calcula ahora cu&aacute;nto ahorrar&iacute;as t&uacute; &rarr;</button>
+</div>
+<!-- SIMULATION -->
+<main id="simMain" style="display:none">
+<div class="sim-divider"><div class="sim-divider-line"></div><div class="sim-divider-txt">&#x1F4D0; Cuéntanos sobre tu espacio</div><div class="sim-divider-line"></div></div>
+<button class="bhome" id="bhome" onclick="bhomeClick()" type="button">&larr; Volver a la informaci&oacute;n del producto</button>
+<!-- STEP 1 -->
+<div class="card on" id="s0">
+<div class="slb">&#x1F4D0; &iquest;C&oacute;mo es el espacio que quieres refrigerar?</div>
+<div class="fg c3" style="margin-bottom:10px">
+<div class="fl" id="fa"><label>Ancho (m)</label><input type="text" id="ancho" inputmode="decimal" oninput="upv()"><div class="em">Requerido</div></div>
+<div class="fl" id="fl"><label>Largo (m)</label><input type="text" id="largo" inputmode="decimal" oninput="upv()"><div class="em">Requerido</div></div>
+<div class="fl" id="fh"><label>Alto (m)</label><input type="text" id="alto" inputmode="decimal" oninput="upv()"><div class="em">Requerido</div></div>
+</div>
+<div class="pvw" id="pvw"><span>&#x1F4D0; <strong id="pat">&ndash;</strong> m&sup2;</span><span>&#x1F4E6; <strong id="pvt">&ndash;</strong> m&sup3;</span></div>
+<div class="slb">&#x1F3E0; &iquest;Para qu&eacute; vas a usar este espacio?<span style="color:var(--s);font-weight:700;margin-left:2px">*</span></div>
+<div class="chg" id="usoGrid">
+<div class="ch" data-f="0.05" onclick="su(this)"><div class="ic">&#x1F6CF;</div><div class="nm">Dormitorio</div><div class="tg">+5%</div></div>
+<div class="ch" data-f="0.10" onclick="su(this)"><div class="ic">&#x1F6CB;</div><div class="nm">Sala</div><div class="tg">+10%</div></div>
+<div class="ch" data-f="0.20" onclick="su(this)"><div class="ic">&#x1F3EA;</div><div class="nm">Local</div><div class="tg">+20%</div></div>
+<div class="ch" data-f="0.25" onclick="su(this)"><div class="ic">&#x1F4BC;</div><div class="nm">Oficina</div><div class="tg">+25%</div></div>
+<div class="ch" data-f="0.30" onclick="su(this)"><div class="ic">&#x1F37D;</div><div class="nm">Restaurante</div><div class="tg">+30%</div></div>
+<div class="ch" data-f="0.35" onclick="su(this)"><div class="ic">&#x1F3ED;</div><div class="nm">Industrial</div><div class="tg">+35%</div></div>
+</div>
+<div class="em" id="usoErr" style="margin-top:-10px;margin-bottom:12px">Selecciona el tipo de uso del espacio</div>
+<p style="color: var(--g3); font-size: 0.85rem; margin-top: 15px; margin-bottom: 25px; line-height: 1.4; text-align: center;">
+    <span style="color:var(--s);font-weight:700">*</span> Ajustamos la potencia según el uso, ya que espacios como restaurantes o industrias generan más calor interno y requieren mayor capacidad de enfriamiento.
+</p>
+<div class="slb">&#x1F465; Carga adicional</div>
+<div class="fg c3" style="margin-bottom:0">
+<div class="fl" id="fper"><label>Personas habituales en el espacio</label><input type="text" id="per" inputmode="numeric"><small style="display:block;font-size:11px;color:var(--g4);margin-top:4px">Ingresa la cantidad promedio de personas, no el m&aacute;ximo ocasional.</small><div class="em">Requerido</div></div>
+<div class="fl" id="fequ"><label>Equipos electr&oacute;nicos en uso habitual</label><input type="text" id="equ" inputmode="numeric"><small style="display:block;font-size:11px;color:var(--g4);margin-top:4px">Cuenta los equipos que normalmente permanecen encendidos.</small><div class="em">Requerido</div></div>
+<div class="fl" id="fabe"><label>Ventanas/Puertas</label><input type="text" id="abe" inputmode="numeric"><div class="em">Requerido</div></div>
+</div>
+<div class="nav"><div></div><button class="btn bnx" onclick="nx(0)">Siguiente &rarr;</button></div>
+</div>
+<!-- STEP 2 -->
+<div class="card" id="s1">
+<div class="slb">&#x1F4CD; &iquest;D&oacute;nde est&aacute;s y cu&aacute;nto pagas de luz?</div>
+<div class="fg c1" style="margin-bottom:10px">
+<div class="fl" id="fdp">
+<label>Departamento</label>
+<select id="dep" onchange="odc()">
+<option value="">&mdash; Selecciona tu departamento &mdash;</option>
+<optgroup label="Costa Caribe (Air-e &middot; $796/kWh)">
+<option value="796" data-op="Air-e" data-src="Min. Minas ene-2026">Atl&aacute;ntico</option>
+<option value="796" data-op="Air-e" data-src="Min. Minas ene-2026">Magdalena</option>
+<option value="796" data-op="Air-e" data-src="Min. Minas ene-2026">La Guajira</option>
+</optgroup>
+<optgroup label="Costa Caribe (AFINIA &middot; $879/kWh)">
+<option value="879" data-op="AFINIA" data-src="Min. Minas ene-2026">Bol&iacute;var</option>
+<option value="879" data-op="AFINIA" data-src="Min. Minas ene-2026">C&oacute;rdoba</option>
+<option value="879" data-op="AFINIA" data-src="Min. Minas ene-2026">Sucre / Cesar</option>
+</optgroup>
+<optgroup label="Interior y Eje Cafetero">
+<option value="840" data-op="EPM" data-src="EPM 2025">Antioquia</option>
+<option value="890" data-op="Enel" data-src="Enel 2025">Bogot&aacute; D.C.</option>
+<option value="890" data-op="Enel" data-src="Enel 2025">Cundinamarca</option>
+<option value="855" data-op="Celsia/Emcali" data-src="Celsia 2025">Valle del Cauca</option>
+<option value="870" data-op="ESSA" data-src="Ref. 2025">Santander</option>
+<option value="860" data-op="CHEC" data-src="Ref. 2025">Caldas / Risaralda / Quind&iacute;o</option>
+<option value="860" data-op="Electrificadora" data-src="Ref. 2025">Tolima</option>
+<option value="870" data-op="Electrohuila" data-src="Ref. 2025">Huila</option>
+<option value="875" data-op="Cedenar" data-src="Ref. 2025">Nari&ntilde;o</option>
+<option value="865" data-op="Electroboyac&aacute;" data-src="Ref. 2025">Boyac&aacute;</option>
+<option value="860" data-op="Regional" data-src="Ref. 2025">Meta / Caquet&aacute; / Putumayo</option>
+<option value="1100" data-op="ZNI" data-src="UPME 2025">San Andr&eacute;s</option>
+</optgroup>
+<optgroup label="Otro"><option value="860" data-op="Promedio nacional" data-src="Estimado 2025">Otro departamento</option></optgroup>
+</select>
+<div class="em">Selecciona un departamento</div>
+</div>
+</div>
+<!-- Tarjeta de tarifa estimada (visible al elegir departamento) -->
+<div class="tcard" id="tcard">
+<div class="tcard-l">
+<div class="tcard-lbl">Tarifa estimada</div>
+<div class="tcard-src" id="tsrc">&mdash;</div>
+</div>
+<div class="tcard-r">
+<div class="tcard-val">$<span id="tdsp">&mdash;</span></div>
+<div class="tcard-k">COP/kWh</div>
+</div>
+</div>
+<!-- Toggle: tarifa manual -->
+<label class="mtw" id="mtwrap">
+<input type="checkbox" id="mt" onchange="omt()">
+<span>&iquest;Deseas ingresar tu tarifa manualmente?</span>
+</label>
+<!-- Input manual + mensaje explicativo (colapsable) -->
+<div class="mti" id="mti">
+<label for="tman">Tu tarifa (COP/kWh)</label>
+<input type="text" id="tman" inputmode="decimal" placeholder="Ej. 840" oninput="opm()">
+<div class="em">Ingresa un n&uacute;mero v&aacute;lido mayor a 0</div>
+<div class="mt-hint">&#x1F4A1; Encuentra este dato en tu factura como <strong>&ldquo;Costo Unitario&rdquo; (CU)</strong>. Hace que el c&aacute;lculo de ahorro sea m&aacute;s real.</div>
+</div>
+<div class="slb">&#x1F3E2; Cantidad de espacios</div>
+<div class="fg c1" style="margin-bottom:18px">
+<div class="fl"><label>N&uacute;mero de espacios a climatizar</label>
+<select id="cnt"><option value="1">1 espacio</option><option value="2">2 espacios</option><option value="3">3 espacios</option><option value="4">4 espacios</option><option value="5">5 espacios</option></select>
+</div>
+</div>
+<div class="slb">&#x23F0; Horario de uso</div>
+<div class="chg" id="horGrid">
+<div class="ch sc on" data-f="1.0" onclick="sm(this)"><div class="ic">&#x2600;&#xFE0F;</div><div class="nm">Diurno</div><div class="sb">7am&ndash;5pm &middot; M&aacute;x. ahorro</div></div>
+<div class="ch sc" data-f="0.55" onclick="sm(this)"><div class="ic">&#x26C5;&#xFE0F;</div><div class="nm">Mixto</div><div class="sb">D&iacute;a y parte noche</div></div>
+<div class="ch sc" data-f="0.15" onclick="sm(this)"><div class="ic">&#x1F319;</div><div class="nm">Nocturno</div><div class="sb">Principalmente noche</div></div>
+</div>
+<div class="nav"><button class="btn bbk" onclick="bk()">&larr; Atr&aacute;s</button><button class="btn bca" onclick="calc()">&#x1F506; Ver mi ahorro &rarr;</button></div>
+</div>
+<!-- RESULTS -->
+<div id="res">
+<div class="rh"><div class="rhl">&#x1F389; Tu simulaci&oacute;n est&aacute; lista</div><div class="rhm" id="rm">&ndash;</div><div class="rhs" id="rs">&ndash;</div><div class="rbg" id="rb">&ndash;</div></div>
+<div class="malert" id="rma"></div>
+<div style="background:#FFF8E6;border:1.5px solid #F0A020;border-radius:var(--rs);padding:13px 16px;margin-bottom:14px;font-size:12px;line-height:1.65;color:#7A5000"><strong>Importante:</strong> esta simulaci&oacute;n es aproximada y no reemplaza la visita t&eacute;cnica obligatoria, necesaria para definir las caracter&iacute;sticas finales de tu proyecto.</div>
+<div class="hg hg3">
+<div class="hc accent wide"><div class="hic">&#x1F4B8;</div><div class="hlb">Valor estimado del proyecto</div><div class="hval" id="rv">&ndash;</div><div class="hun">COP estimado</div><div class="htip" id="rv2">&ndash;</div></div>
+<div class="hc accent"><div class="hic">&#x23F3;</div><div class="hlb">Payback estimado</div><div class="hval" id="rp">&ndash;</div><div class="hun">a&ntilde;os</div><div class="htip" id="rp2">&ndash;</div></div>
+<div class="hc"><div class="hic">&#x1F4B0;</div><div class="hlb">Ahorro anual estimado</div><div class="hval" id="ra">&ndash;</div><div class="hun">COP al a&ntilde;o</div><div class="htip" id="ra2">&ndash;</div></div>
+</div>
+<div class="comp-wrap">
+<div class="comp-tit">Comparativo Solar vs Convencional <span style="display:block;font-size:10px;font-weight:600;letter-spacing:.2px;text-transform:none;color:var(--g4);margin-top:4px">Valores estimados con instalaci&oacute;n incluida</span></div>
+<table class="cpt">
+<thead><tr><th>Concepto</th><th>&#x2600; Solar</th><th>Convencional</th></tr></thead>
+<tbody>
+<tr><td>Valor del sistema</td><td id="cvs">&ndash;</td><td id="cvc">&ndash;</td></tr>
+<tr><td>Mano de obra estimada</td><td id="cis">&ndash;</td><td id="cic">&ndash;</td></tr>
+<tr class="cpt-sub"><td><strong>Inversi&oacute;n inicial total</strong></td><td id="cps"><strong>&ndash;</strong></td><td id="cpc"><strong>&ndash;</strong></td></tr>
+<tr><td>Consumo red / mes</td><td id="ccs">&ndash;</td><td id="ccc">&ndash;</td></tr>
+<tr><td>Costo energ&iacute;a / mes</td><td id="ces">&ndash;</td><td id="cec">&ndash;</td></tr>
+<tr><td>Costo energ&iacute;a / a&ntilde;o</td><td id="cas">&ndash;</td><td id="cac">&ndash;</td></tr>
+<tr><td>Mantenimiento / a&ntilde;o</td><td id="cms">&ndash;</td><td id="cmc">&ndash;</td></tr>
+<tr><td colspan="3" style="font-size:11px;color:var(--g3);padding:6px 13px;line-height:1.5">* El valor de mano de obra es estimado y se confirma tras visita t&eacute;cnica obligatoria. El mantenimiento solar incluye limpieza de paneles, revisi&oacute;n del kit solar y servicio del equipo AC.</td></tr>
+</tbody>
+</table>
+</div>
+<!-- LEAD FORM -->
+<div class="lw">
+<div class="lt">&#x1F4B8; &iexcl;Empieza a ahorrar este mes!</div>
+<div class="ls">Esta simulaci&oacute;n te da una estimaci&oacute;n cercana de tu ahorro. Para confirmar los valores exactos seg&uacute;n las condiciones de tu espacio, escr&iacute;benos por WhatsApp y recibe tu cotizaci&oacute;n formal con la visita t&eacute;cnica incluida. Sin compromiso, sin presiones.</div>
+<div class="fg c1" style="margin-bottom:12px"><div class="fl"><label>Nombre completo</label><input type="text" id="lnn" placeholder="Tu nombre" autocomplete="name"></div></div>
+<div class="fg c2" style="margin-bottom:12px">
+<div class="fl"><label>Tel&eacute;fono / WhatsApp</label><input type="tel" id="lnt" placeholder="3XX XXX XXXX" inputmode="tel" autocomplete="tel"></div>
+<div class="fl"><label>Correo electr&oacute;nico</label><input type="email" id="lne" placeholder="tu@correo.com" inputmode="email" autocomplete="email"></div>
+</div>
+<button class="bwp" onclick="lwp()"><span class="bwp-ic">&#x1F4AC;</span><span>Obt&eacute;n tu cotizaci&oacute;n por WhatsApp</span></button>
+<div id="lfs"></div>
+<label class="lpd" id="lpd">
+<input type="checkbox" id="lpdc">
+<span>Acepto la <a href="https://drive.google.com/file/d/1-qOHaPdv22TjdKBVEWMg7ryII2_weoMB/view?usp=drive_link" target="_blank" rel="noopener">pol&iacute;tica de tratamiento de datos personales</a> y autorizo el uso de mi informaci&oacute;n para ser contactado con la cotizaci&oacute;n solicitada.</span>
+</label>
+<div class="lnot">&#x1F512; Tus datos son privados. Solo los usamos para enviarte tu simulaci&oacute;n y atenderte v&iacute;a WhatsApp.</div>
+</div>
+<div class="fd">* Estimaciones con tarifas referencia 2025 (Min. Minas, CREG). C&aacute;lculo BTU est&aacute;ndar ASHRAE clima tropical colombiano (150 BTU/m&sup3;, RETIE, NTC-2052). Ahorro en escenario uso intensivo (&sim;16 h/d&iacute;a); el ahorro real var&iacute;a seg&uacute;n horas de uso, tarifa vigente e irradiaci&oacute;n solar local.</div>
+<button class="brs" onclick="rst()">&#x21BA; Hacer una nueva simulaci&oacute;n</button>
+</div>
+</main>
+<footer>Simulador de ahorro con aire acondicionado solar</footer>
+<script>
+var $=function(i){return document.getElementById(i)},$$=function(s){return document.querySelectorAll(s)};
+(function(){
+// WhatsApp sin destinatario fijo: el usuario elige a quién enviar el mensaje
+window._WB='https://api.whatsapp.com/send?';
+})();
+var SWURL='https://script.google.com/macros/s/AKfycbx5jgiKSVpePdWIJ92BX8W1yZl1L-SPutc_EVxQZrjvChXVgHlJaSNu9pltn-RarCyo/exec';
+
+// ────────────────────────────────────────────────────────────────────
+// CFG: parámetros comerciales con valores por defecto (fallback).
+// Se sobrescriben en runtime con el CSV remoto (loadCFG()).
+// Cualquier ajuste de precios, tarifas o factores se hace en el Sheet.
+// ────────────────────────────────────────────────────────────────────
+var CFG={
+TASA:0.05,                       // inflación energética anual
+TAR_DEFAULT:840,                 // tarifa OR por defecto (COP/kWh)
+BTU_M3:150,BTU_PER:700,BTU_EQ:600,BTU_AB:1200,  // factores BTU (ASHRAE)
+MF_DIA:1.0,MF_MIX:0.55,MF_NOC:0.15,             // % aporte solar por modo horario
+UF_DORM:0.05,UF_SALA:0.10,UF_LOC:0.20,UF_OFI:0.25,UF_RES:0.30,UF_IND:0.35, // recargo por uso
+LD_DELAY:3000,                   // delay del loading screen (ms)
+// ── Instalación dinámica por tecnología (conv/sol) × capacidad (12k/18k/24k) ──
+// Formato de llave: inst_<tecnologia>_<capacidad>
+inst_conv_12k:461538,
+inst_conv_18k:715385,
+inst_conv_24k:969231,
+inst_sol_12k:2123400,
+inst_sol_18k:2811900,
+inst_sol_24k:3435150,
+// ── Catálogo de equipos: precio (sp/cp), consumo (sg/cm) y mantenimiento (sm2/cv) ──
+AC:{
+'12K':{btu:12000,sp:7078000,cp:2000000,sg:0,cm:300,sm2:500000,cv:300000,lb:'12.000 BTU'},
+'18K':{btu:18000,sp:9373000,cp:3100000,sg:0,cm:420,sm2:600000,cv:400000,lb:'18.000 BTU'},
+'24K':{btu:24000,sp:11450500,cp:4200000,sg:0,cm:540,sm2:700000,cv:500000,lb:'24.000 BTU'}
+}
+};
+// URL del CSV publicado: File → Share → Publish to web → CSV (Google Sheets)
+// Estructura esperada: 2 columnas (key, value). Reemplazar cuando esté lista la hoja.
+var CFG_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vSgq2Cij7HEvDodeXyVtuFO1bdKKRYxV1Szd000UM36wb0Yl5qz_4AYHsYjwi3OAGxb0AGSpLf2_r3h/pub?gid=0&single=true&output=csv';
+
+// Parser CSV minimal — soporta comillas, separador coma y saltos de línea
+function parseCSV(t){
+var rows=[],r=[],s='',q=false,i;
+for(i=0;i<t.length;i++){
+var c=t[i],n=t[i+1];
+if(q){if(c=='"'&&n=='"'){s+='"';i++;}else if(c=='"'){q=false;}else{s+=c;}}
+else{if(c=='"'){q=true;}else if(c==','){r.push(s);s='';}else if(c=='\n'||c=='\r'){if(s||r.length){r.push(s);rows.push(r);r=[];s='';}if(c=='\r'&&n=='\n')i++;}else{s+=c;}}
+}
+if(s||r.length){r.push(s);rows.push(r);}
+return rows;
+}
+
+// Parser numérico para inputs del usuario (dimensiones y conteos)
+// Acepta: "4", "4.5", "4,5", "0", "0,0", "1,500" (= 1.5 en formato es-CO)
+// Rechaza: "", "abc", "4,5,6", "4..5", "4.5.6", "-4"
+// Filosofía: la coma es separador decimal (formato es-CO), no de miles.
+// Cualquier formato con múltiples separadores es inválido.
+function pn(v){
+if(v===null||v===undefined)return NaN;
+var s=String(v).trim().replace(/\s/g,'').replace(',','.');
+if(!/^\d+(\.\d+)?$/.test(s))return NaN;
+return parseFloat(s);
+}
+
+// Normaliza un string numérico: elimina separadores de miles, símbolos de moneda y espacios
+// Acepta: "1.500.000", "1,500,000", "$1500000", "COP 1500000", "1500000.50"
+function cfgNum(v){
+if(v===null||v===undefined)return NaN;
+var s=String(v).trim();
+if(!s)return NaN;
+// Remove currency symbols and spaces
+s=s.replace(/[$\s]|COP|cop/g,'');
+// Heuristic: if the string has both comma and period, the last of the two is the decimal separator
+var hasC=s.indexOf(',')>-1,hasP=s.indexOf('.')>-1;
+if(hasC&&hasP){
+if(s.lastIndexOf(',')>s.lastIndexOf('.')){s=s.replace(/\./g,'').replace(',','.');}
+else{s=s.replace(/,/g,'');}
+}else if(hasC){
+// Solo comas: si hay más de una, son separadores de miles (1,500,000); si hay una y <=3 decimales no, igual tratamos como miles
+var parts=s.split(',');
+if(parts.length>2||(parts.length===2&&parts[1].length===3)){s=s.replace(/,/g,'');}
+else{s=s.replace(',','.');}
+}else if(hasP){
+// Solo puntos: si más de uno son separadores de miles
+var partsP=s.split('.');
+if(partsP.length>2||(partsP.length===2&&partsP[1].length===3)){s=s.replace(/\./g,'');}
+}
+return parseFloat(s);
+}
+
+// Aplica overrides del CSV sobre el objeto CFG (preserva fallback si fila inválida)
+function applyCFG(rows){
+if(!rows||!rows.length)return;
+var applied=0,skipped=0;
+for(var i=0;i<rows.length;i++){
+var k=(rows[i][0]||'').trim(),v=(rows[i][1]||'').trim();
+if(!k||k.toLowerCase()=='key'||k.charAt(0)=='#'){skipped++;continue;}
+// Patrón AC.<modelo>.<campo> ej "AC.12K.sp"
+if(k.indexOf('AC.')===0){
+var p=k.split('.');
+if(p.length===3&&CFG.AC[p[1]]&&p[2] in CFG.AC[p[1]]){
+var nv=cfgNum(v);if(!isNaN(nv)){CFG.AC[p[1]][p[2]]=nv;applied++;}else{skipped++;console.warn('[CFG] Valor inválido ignorado:',k,'=',v);}
+}else{skipped++;console.warn('[CFG] Llave AC desconocida ignorada:',k);}
+}else if(k in CFG){
+var nv2=cfgNum(v);if(!isNaN(nv2)){CFG[k]=nv2;applied++;}else{skipped++;console.warn('[CFG] Valor inválido ignorado:',k,'=',v);}
+}else{
+skipped++;console.warn('[CFG] Llave desconocida ignorada:',k);
+}
+}
+console.log('[CFG] Overrides aplicados:',applied,'| ignorados:',skipped);
+}
+
+// Estado de carga del CFG — permite a calc() esperar si aún no resolvió
+window._cfgReady=false;
+window._cfgPromise=null;
+
+// Carga remota — retorna Promise. Logs visibles para diagnóstico.
+function loadCFG(){
+if(!CFG_URL){console.warn('[CFG] CFG_URL vacío — usando fallback');window._cfgReady=true;return Promise.resolve();}
+console.log('[CFG] Cargando configuración desde:',CFG_URL);
+window._cfgPromise=fetch(CFG_URL,{method:'GET',cache:'no-store',redirect:'follow'})
+.then(function(r){
+if(!r.ok){throw new Error('HTTP '+r.status+' '+r.statusText);}
+return r.text();
+})
+.then(function(t){
+if(!t||!t.length){console.warn('[CFG] CSV vacío');window._cfgReady=true;return;}
+var rows=parseCSV(t);
+console.log('[CFG] CSV descargado:',rows.length,'filas');
+applyCFG(rows);
+window._cfgReady=true;
+console.log('[CFG] \u2705 Configuración aplicada. Muestra de valores activos:',{
+TASA:CFG.TASA,
+TAR_DEFAULT:CFG.TAR_DEFAULT,
+'AC.12K.sp':CFG.AC['12K'].sp,
+'AC.18K.sp':CFG.AC['18K'].sp,
+'AC.24K.sp':CFG.AC['24K'].sp,
+inst_sol_12k:CFG.inst_sol_12k,
+inst_sol_18k:CFG.inst_sol_18k,
+inst_sol_24k:CFG.inst_sol_24k
+});
+})
+.catch(function(e){
+console.error('[CFG] \u274c Error al cargar CSV:',e.message);
+console.warn('[CFG] Operando con valores fallback del código');
+window._cfgReady=true;
+});
+return window._cfgPromise;
+}
+loadCFG();
+
+// Alias retro-compatibles. NOTA: AC es referencia al objeto dentro de CFG,
+// por lo que cualquier update de CFG.AC.X.Y vía CSV se refleja automáticamente.
+// Los valores escalares (mf, tar) se inicializan con fallback pero se
+// actualizan en tiempo real cuando el usuario interactúa o desde el CSV.
+var AC=CFG.AC;
+var uf=null,mf=CFG.MF_DIA,tar=CFG.TAR_DEFAULT;
+function startSim(){
+var h=document.querySelector('.hero');if(h)h.style.display='none';
+var ib=document.querySelector('.iso-band');if(ib)ib.style.display='none';
+$('techIntro').style.display='none';$('featSection').style.display='none';
+$$('[onclick="startSim()"]').forEach(function(b){b.style.display='none';});
+var p=document.querySelector('.pnav');if(p){p.style.display='';p.style.top='64px';}
+$('simMain').style.display='block';$('plbl').textContent='Paso 1 de 2 \u2014 Tu espacio';
+window.scrollTo({top:0,behavior:'smooth'});
+}
+// Handler contextual del botón "Volver": si la pantalla de resultados está
+// visible, regresa al Paso 2 conservando los datos. En otro caso, vuelve al hero.
+function bhomeClick(){
+if($('res').style.display==='block')goStep(1);
+else goHome();
+}
+function goHome(){
+var h=document.querySelector('.hero');if(h)h.style.display='block';
+var ib=document.querySelector('.iso-band');if(ib)ib.style.display='';
+$('techIntro').style.display='block';$('featSection').style.display='block';
+$$('[onclick="startSim()"]').forEach(function(b){b.style.display='';});
+$('simMain').style.display='none';$('res').style.display='none';
+$('bhome').innerHTML='\u2190 Volver a la informaci\u00f3n del producto';
+var p=document.querySelector('.pnav');if(p)p.style.display='none';
+$('plbl').textContent='Paso 1 de 2 \u2014 Tu espacio';
+var d0=$('d0'),d1=$('d1'),l0=$('l0');
+d0.classList.remove('on','dn');d1.classList.remove('on','dn');l0.classList.remove('dn');d0.classList.add('on');
+window.scrollTo({top:0,behavior:'smooth'});
+}
+function selM(b){
+if(b<=12000)return{k:'12K',u:1,combo:false};
+if(b<=18000)return{k:'18K',u:1,combo:false};
+if(b<=24000)return{k:'24K',u:1,combo:false};
+var n=Math.ceil(b/24000),r=b-(n-1)*24000;
+if(r<=12000&&n>1)return{k:'24K',u:n-1,ck:'12K',cu:1,combo:true,tb:(n-1)*24000+12000};
+return{k:'24K',u:n,combo:false,tb:n*24000};
+}
+function nx(s){if(!vl(s))return;goStep(1);}
+function bk(){goStep(0);}
+function goStep(n){
+$$('.card').forEach(function(c){c.classList.remove('on');});
+$('s'+n).classList.add('on');
+$('bhome').innerHTML='\u2190 Volver a la informaci\u00f3n del producto';
+var d0=$('d0'),d1=$('d1'),l0=$('l0');
+d0.classList.remove('on','dn');d1.classList.remove('on','dn');l0.classList.remove('dn');
+if(n===0){d0.classList.add('on');$('fdp').classList.remove('inv');}
+else{d0.classList.add('dn');l0.classList.add('dn');d1.classList.add('on');['fa','fl','fh','fper','fequ','fabe'].forEach(function(id){$(id).classList.remove('inv');});$('usoGrid').classList.remove('inv');}
+$('res').style.display='none';
+$('plbl').textContent=n===0?'Paso 1 de 2 \u2014 Tu espacio':'Paso 2 de 2 \u2014 Ubicaci\u00f3n y horario';
+window.scrollTo({top:0,behavior:'smooth'});
+}
+function vl(s){
+var ok=true;
+if(s===0){
+['fa','fl','fh'].forEach(function(id,i){
+var v=pn($(['ancho','largo','alto'][i]).value);
+$(id).classList.toggle('inv',!v||v<=0);if(!v||v<=0)ok=false;
+});
+var ui=uf===null;$('usoGrid').classList.toggle('inv',ui);if(ui)ok=false;
+// Validación de carga adicional: acepta 0 explícito, rechaza vacío o no-numérico
+[['fper','per'],['fequ','equ'],['fabe','abe']].forEach(function(par){
+var raw=$(par[1]).value.trim();
+var inv=raw===''||isNaN(pn(raw));
+$(par[0]).classList.toggle('inv',inv);
+if(inv)ok=false;
+});
+}
+if(s===1){
+if(!$('dep').value){$('fdp').classList.add('inv');return false;}
+if($('mt').checked){
+var raw=$('tman').value.trim();
+var v=pn(raw);
+if(raw===''||isNaN(v)||v<=0){$('mti').classList.add('inv');return false;}
+}
+}
+return ok;
+}
+function su(el){$$('#usoGrid .ch').forEach(function(c){c.classList.remove('on');});el.classList.add('on');uf=parseFloat(el.dataset.f);$('usoGrid').classList.remove('inv');}
+function sm(el){$$('#horGrid .ch').forEach(function(c){c.classList.remove('on');});el.classList.add('on');mf=parseFloat(el.dataset.f);}
+function upv(){
+var a=pn($('ancho').value)||0,l=pn($('largo').value)||0,h=pn($('alto').value)||0,pv=$('pvw');
+if(a>0&&l>0&&h>0){pv.classList.add('show');$('pat').textContent=(a*l).toFixed(1);$('pvt').textContent=(a*l*h).toFixed(1);}
+else pv.classList.remove('show');
+}
+function odc(){
+var sel=$('dep'),opt=sel.options[sel.selectedIndex],v=parseInt(sel.value)||0;
+if(!v||isNaN(v)){$('tcard').classList.remove('on');$('mtwrap').classList.remove('on');return;}
+$('fdp').classList.remove('inv');
+$('tdsp').textContent=v.toLocaleString('es-CO');
+$('tsrc').textContent=(opt.dataset.op||'\u2013')+' \u00b7 '+(opt.dataset.src||'\u2013');
+$('tcard').classList.add('on');
+$('mtwrap').classList.add('on');
+// Si el modo manual está activo, conserva el valor manual; si no, usa el del departamento
+if(!$('mt').checked)tar=v;
+}
+// Toggle del modo manual: muestra/oculta input y decide la fuente de la tarifa
+function omt(){
+var on=$('mt').checked;
+$('mti').classList.toggle('on',on);
+if(on){opm();}
+else{
+$('mti').classList.remove('inv');
+var v=parseInt($('dep').value)||0;
+if(v)tar=v;
+}
+}
+// Parser en tiempo real del input manual: actualiza 'tar' si el valor es válido
+function opm(){
+$('mti').classList.remove('inv');
+var v=pn($('tman').value);
+if(!isNaN(v)&&v>0)tar=v;
+}
+function calc(){
+if(!$('dep').value){$('fdp').classList.add('inv');window.scrollTo({top:0,behavior:'smooth'});return;}
+// ── Esperar a que el CFG termine de cargar (evita usar fallback si CSV aún viene en vuelo) ──
+if(!window._cfgReady&&window._cfgPromise){
+console.log('[CFG] Esperando a que termine de cargar antes de calcular...');
+window._cfgPromise.then(function(){calc();});
+return;
+}
+var a=pn($('ancho').value),l=pn($('largo').value),h=pn($('alto').value);
+var per=pn($('per').value)||0,eq=pn($('equ').value)||0,ab=pn($('abe').value)||0;
+var cs=parseInt($('cnt').value)||1,vol=a*l*h;
+var bb=vol*CFG.BTU_M3+per*CFG.BTU_PER+eq*CFG.BTU_EQ+ab*CFG.BTU_AB,bs=Math.round(bb*(1+uf)),bt=bs*cs;
+var sel=selM(bt),m1=AC[sel.k],u=sel.u,m2=sel.combo?AC[sel.ck]:null,cu=sel.combo?sel.cu:0;
+var spT=m1.sp*u+(m2?m2.sp*cu:0),cpT=m1.cp*u+(m2?m2.cp*cu:0),dp=spT-cpT;
+// ── Selección dinámica de instalación ──
+// Tecnología: 'sol' para aire solar híbrido AC/DC · 'conv' para aire tradicional
+// Capacidad: '12k' / '18k' / '24k' según modelo seleccionado por BTU
+var tecnologia='sol';                         // este simulador promociona la línea solar
+var capacidad=sel.k.toLowerCase();            // '12K' → '12k', '18K' → '18k', '24K' → '24k'
+var capacidadCombo=sel.combo?sel.ck.toLowerCase():null;
+// Llaves construidas dinámicamente: inst_sol_18k, inst_conv_24k, etc.
+var instSol=CFG['inst_sol_'+capacidad]*u+(m2?CFG['inst_sol_'+capacidadCombo]*cu:0);
+var instConv=CFG['inst_conv_'+capacidad]*u+(m2?CFG['inst_conv_'+capacidadCombo]*cu:0);
+var ipT=instSol,isT=spT-ipT;                  // mano de obra solar + sistema solar
+var ipcT=instConv,icsT=cpT-ipcT;              // mano de obra conv + sistema conv
+var sg=m1.sg*u+(m2?m2.sg*cu:0),cm=m1.cm*u+(m2?m2.cm*cu:0);
+var gm=mf*sg+(1-mf)*cm,csm=gm*tar,ccm=cm*tar,aem=ccm-csm,aea=aem*12;
+var msT=m1.sm2*u+(m2?m2.sm2*cu:0),mcT=m1.cv*u+(m2?m2.cv*cu:0),am=mcT-msT,an=aea+am;
+var pb=an>0?dp/an:99;
+var TASA=CFG.TASA,ac=0,by=null,r10=0;
+for(var y=1;y<=10;y++){var tY=tar*Math.pow(1+TASA,y-1);ac+=(cm-gm)*12*tY+am;if(by===null&&(ac-dp)>=0)by=y;if(y===10)r10=ac-dp;}
+var ml2=sel.combo?u+'\u00d7 '+m1.lb+' + '+cu+'\u00d7 '+AC[sel.ck].lb:(u>1?u+'\u00d7 '+m1.lb:m1.lb);
+$('s1').classList.remove('on');$('loadingScreen').style.display='flex';
+window._CALC={spT:spT,cpT:cpT,ipT:ipT,isT:isT,ipcT:ipcT,icsT:icsT,dp:dp,sg:sg,cm:cm,gm:gm,csm:csm,ccm:ccm,aem:aem,aea:aea,msT:msT,mcT:mcT,am:am,an:an,pb:pb,r10:r10,by:by,bt:bt,bs:bs,cs:cs,a:a,l:l,vol:vol,ml2:ml2,sel:sel,m1:m1,m2:m2,u:u,cu:cu};
+setTimeout(function(){$('loadingScreen').style.display='none';renderResults(window._CALC);},CFG.LD_DELAY);
+}
+function renderResults(d){
+$$('.card').forEach(function(p){p.classList.remove('on');});
+$('res').style.display='block';
+$('bhome').innerHTML='\u2190 Editar mis datos';
+['d0','d1'].forEach(function(id){$(id).classList.remove('on');$(id).classList.add('dn');});
+$('l0').classList.add('dn');$('plbl').textContent='Tu simulaci\u00f3n est\u00e1 lista \u2728';
+window.scrollTo({top:0,behavior:'smooth'});
+$('rm').textContent=d.ml2;
+$('rs').textContent=d.cs>1?'Para '+d.cs+' espacios \u00b7 '+d.bs.toLocaleString('es-CO')+' BTU/espacio':'Para tu espacio de '+(d.a*d.l).toFixed(1)+' m\u00b2 \u00b7 '+d.vol.toFixed(1)+' m\u00b3';
+$('rb').textContent='\u26a1 BTU requeridos: '+d.bt.toLocaleString('es-CO');
+var mal=$('rma');
+if(d.sel.combo){mal.style.display='block';mal.innerHTML='<strong>Configuraci\u00f3n combinada:</strong> Tu espacio requiere '+d.bt.toLocaleString('es-CO')+' BTU. Recomendamos <strong>'+d.u+'\u00d7 '+d.m1.lb+' + '+d.cu+'\u00d7 '+AC[d.sel.ck].lb+'</strong>. Un asesor te orientar\u00e1.';}
+else mal.style.display='none';
+$('ra').textContent=cop(Math.max(0,d.aea));
+$('ra2').textContent='Aprox. '+cop(Math.max(0,Math.round(d.aem)))+' menos al mes';
+$('rv').textContent=cop(d.spT);$('rv2').textContent='Incluye equipo, sistema DC e instalaci\u00f3n estimada \u00b7 sujeto a visita t\u00e9cnica obligatoria';
+$('rp').textContent=d.pb<10?d.pb.toFixed(1):'>10';
+$('rp2').textContent=d.pb<10?(d.by?'Con inflaci\u00f3n energ\u00e9tica, se recupera en el a\u00f1o '+d.by:'A partir del a\u00f1o '+Math.ceil(d.pb)+' es ganancia neta'):'Considera mayor uso en horas solares';
+$('cvs').textContent=cop(d.isT);$('cvc').textContent=cop(d.icsT);
+$('cis').textContent=cop(d.ipT);$('cic').textContent=cop(d.ipcT);
+$('cps').textContent=cop(d.spT);$('cpc').textContent=cop(d.cpT);
+$('ccs').textContent=Math.round(d.gm)+' kWh/mes';$('ccc').textContent=Math.round(d.cm)+' kWh/mes';
+$('ces').textContent=cop(Math.round(d.csm));$('cec').textContent=cop(Math.round(d.ccm));
+$('cas').textContent=cop(Math.round(d.csm*12));$('cac').textContent=cop(Math.round(d.ccm*12));
+$('cms').textContent=cop(d.msT)+' / a\u00f1o';$('cmc').textContent=cop(d.mcT)+' / a\u00f1o';
+window._RES={modelo:d.ml2,btu:d.bt.toLocaleString('es-CO'),ahorro:cop(Math.max(0,d.aea)),payback:(d.pb<10?d.pb.toFixed(1):'>10')+' a\u00f1os',ret10:(d.r10>=0?'':'-')+cop(Math.abs(d.r10)),tarifa:'$'+tar.toLocaleString('es-CO')+'/kWh',
+// Desglose solar (tecnología seleccionada)
+valSistema:cop(d.isT),valInstalacion:cop(d.ipT),inversionTotal:cop(d.spT),
+// Desglose convencional (referencia comparativa)
+valSistemaConv:cop(d.icsT),valInstalacionConv:cop(d.ipcT),inversionTotalConv:cop(d.cpT),
+// Trazabilidad de la llave usada
+capacidadKey:d.sel.k,tecnologiaKey:'sol',mod:d.sel.k};
+// ─── Inyección: detalle técnico del kit (se regenera en cada simulación) ───
+renderKitDetail(d);
+}
+// Componentes incluidos en el kit — escala paneles según modelo y maneja combo
+function renderKitDetail(d){
+var resContainer=$('res');if(!resContainer)return;
+var existing=$('kitDetailSim');if(existing)existing.remove();
+// Tabla oficial de fabricante (paneles 400-500W): 12K=3, 18K=5, 24K=7. Conservamos 4/6/7
+// como margen de seguridad comercial por irradiancia variable.
+var P={'12K':4,'18K':6,'24K':7};
+var nP=(P[d.sel.k]||4)*(d.u||1);
+if(d.sel.combo&&d.sel.ck&&d.cu)nP+=(P[d.sel.ck]||0)*d.cu;
+var totalUnits=(d.u||1)+(d.sel.combo?(d.cu||0):0);
+var unitTxt=totalUnits>1?totalUnits+' unidades de aire ':'1 unidad de aire ';
+// Iconos SVG inline (24px, monocromos, stroke en --s)
+var IC={
+panel:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18l-2 12H5L3 4z"/><path d="M9 4v12M15 4v12M3 8h18M4 12h17"/><path d="M12 16v4M9 20h6"/></svg>',
+ac:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="9" rx="1.5"/><path d="M2.5 10.5h19"/><path d="M7 17.5c0 1.4 1.1 2.5 2.5 2.5M12 17.5c0 1.4 1.1 2.5 2.5 2.5M17 17.5c0 1.4 1.1 2.5 2.5 2.5"/></svg>',
+struct:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19h18"/><path d="M5 19V9l7-4 7 4v10"/><path d="M5 9l7 4 7-4M12 13v6"/></svg>',
+breaker:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 7h6M9 11h6M9 15h6"/><circle cx="7" cy="7" r=".6" fill="currentColor"/><circle cx="7" cy="11" r=".6" fill="currentColor"/><circle cx="7" cy="15" r=".6" fill="currentColor"/></svg>',
+cable:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17c3 0 3-10 6-10s3 10 6 10 3-10 6-10"/><circle cx="3" cy="17" r="1.4"/><circle cx="21" cy="7" r="1.4"/></svg>',
+sun:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>'
+};
+var items=[
+{ic:IC.panel,t:'Paneles solares fotovoltaicos',d:nP+' \u00d7 paneles Bifacial Tipo N (rango 450\u2013625 W). Cantidad sujeta a radiación disponible y pérdidas por sombreado'},
+{ic:IC.ac,t:'Aire acondicionado solar h\u00edbrido AC/DC',d:unitTxt+' (consola interior + condensadora exterior) con tecnolog\u00eda inverter y conmutaci\u00f3n autom\u00e1tica solar/red.'},
+{ic:IC.struct,t:'Estructura de montaje',d:'Soportes en aluminio anodizado para fijaci\u00f3n de los paneles en cubierta, ajustados al tipo de teja seg\u00fan visita t\u00e9cnica.'},
+{ic:IC.breaker,t:'Caja de protecciones el\u00e9ctricas',d:'Tablero con breakers DC/AC y supresor de picos (DPS) para garantizar seguridad el\u00e9ctrica conforme a RETIE.'},
+{ic:IC.cable,t:'Cableado y conectores',d:'Conductor solar con protecci\u00f3n UV y conectores MC4 de acople r\u00e1pido para el tendido entre paneles y unidad exterior.'}
+];
+var rows=items.map(function(it){
+return '<div style="display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:flex-start">'+
+'<div style="width:38px;height:38px;border-radius:8px;background:var(--sm);color:var(--s);display:flex;align-items:center;justify-content:center;flex-shrink:0">'+it.ic+'</div>'+
+'<div>'+
+'<strong style="color:var(--w);display:block;font-size:.92rem;font-weight:600;margin-bottom:3px;letter-spacing:.1px">'+it.t+'</strong>'+
+'<span style="color:var(--g3);font-size:.84rem;line-height:1.55;display:block">'+it.d+'</span>'+
+'</div></div>';
+}).join('');
+var kit=document.createElement('div');
+kit.id='kitDetailSim';
+kit.style.cssText='background:var(--k2);border:1px solid var(--k4);border-radius:var(--r);padding:22px 24px;margin:25px 0;text-align:left';
+kit.innerHTML=
+'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:18px">'+
+'<h3 style="color:var(--w);font-family:\'DM Sans\',sans-serif;font-size:.78rem;font-weight:700;margin:0;text-transform:uppercase;letter-spacing:1.3px">'+
+'<span style="color:var(--s)">'+IC.sun+'</span>Componentes incluidos en tu kit'+
+'</h3>'+
+'<span style="font-size:.7rem;color:var(--g4);text-transform:uppercase;letter-spacing:.8px">Configuraci\u00f3n estimada</span>'+
+'</div>'+
+'<div style="display:grid;gap:18px;border-left:2px solid var(--s);padding-left:18px">'+rows+'</div>'+
+'<div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--k4);font-size:.72rem;color:var(--g4);line-height:1.5">'+
+'Cantidades y especificaciones referenciales. La configuraci\u00f3n final se confirma en la visita t\u00e9cnica obligatoria seg\u00fan condiciones del sitio, tipo de cubierta e irradiancia local.'+
+'</div>';
+var anchor=document.querySelector('#res .lw');
+if(anchor&&anchor.parentNode===resContainer)resContainer.insertBefore(kit,anchor);
+else resContainer.appendChild(kit);
+}
+function sst(m,c){var e=$('lfs');e.textContent=m;e.className=c;}
+function ssv(d){
+if(SWURL.indexOf('TU_SCRIPT')>-1)return;
+var r=window._RES||{},c=window._CALC||{};
+var ucEl=document.querySelector('#usoGrid .ch.on'),hcEl=document.querySelector('#horGrid .ch.on');
+var depEl=$('dep'),depTxt=depEl.options[depEl.selectedIndex]?depEl.options[depEl.selectedIndex].text:'';
+var _now=new Date(),_tz={timeZone:'America/Bogota'};
+var p={fecha:_now.toLocaleDateString('es-CO',_tz),hora:_now.toLocaleTimeString('es-CO',_tz),nombre:d.n,telefono:d.t,email:d.e,
+ancho_m:$('ancho').value||'',largo_m:$('largo').value||'',alto_m:$('alto').value||'',
+area_m2:(c.a&&c.l)?(c.a*c.l).toFixed(1):'',volumen_m3:c.vol?c.vol.toFixed(1):'',
+tipo_uso:ucEl?ucEl.querySelector('.nm').textContent.trim():'',
+personas:$('per').value||'',equipos:$('equ').value||'',aislamiento_aberturas:$('abe').value||'',
+num_espacios:$('cnt').value||'1',horario_uso:hcEl?hcEl.querySelector('.nm').textContent.trim():'',
+ubicacion:depTxt,tarifa:r.tarifa||'',
+modelo:r.modelo||'',btu:r.btu||'',
+valor_sistema:r.valSistema||'',valor_instalacion:r.valInstalacion||'',inversion_total:r.inversionTotal||'',
+valor_sistema_conv:r.valSistemaConv||'',valor_instalacion_conv:r.valInstalacionConv||'',inversion_total_conv:r.inversionTotalConv||'',
+capacidad_key:r.capacidadKey||'',tecnologia_key:r.tecnologiaKey||'',
+ahorro_anual:r.ahorro||'',payback:r.payback||'',retorno_10y:r.ret10||'',
+politica_datos:'aceptada',lead_source:'sunny_air_partner'};
+fetch(SWURL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(p)}).catch(function(){});
+}
+function lwp(){
+var d={n:$('lnn').value.trim(),t:$('lnt').value.trim(),e:$('lne').value.trim()};
+if(!d.n&&!d.t){sst('Ingresa al menos tu nombre o tel\u00e9fono.','lfe');return;}
+if(!window._RES){sst('Completa la simulaci\u00f3n primero.','lfe');return;}
+// BLOQUEO OBLIGATORIO: aceptación de visita técnica / política de datos
+if(!$('lpdc').checked){$('lpd').classList.add('inv');sst('Debes aceptar la pol\u00edtica de tratamiento de datos para continuar.','lfe');return;}
+$('lpd').classList.remove('inv');
+ssv(d);var r=window._RES,c=window._CALC||{};
+// Recolección ampliada — parámetros iniciales del usuario
+var ucEl=document.querySelector('#usoGrid .ch.on'),hcEl=document.querySelector('#horGrid .ch.on');
+var usoLbl=ucEl?ucEl.querySelector('.nm').textContent.trim():'\u2013';
+var horLbl=hcEl?hcEl.querySelector('.nm').textContent.trim():'\u2013';
+var hSub=hcEl?hcEl.querySelector('.sb').textContent.trim():'';
+var anc=$('ancho').value||'\u2013',lar=$('largo').value||'\u2013',alt=$('alto').value||'\u2013';
+var per=$('per').value||'0',equ=$('equ').value||'0',abe=$('abe').value||'0';
+var depEl=$('dep'),depTxt=depEl.options[depEl.selectedIndex]?depEl.options[depEl.selectedIndex].text:'\u2013';
+var nEsp=$('cnt').value||'1',m2t=(c.a&&c.l)?(c.a*c.l).toFixed(1):'\u2013',m3t=c.vol?c.vol.toFixed(1):'\u2013';
+var msg=encodeURIComponent(
+'Hola! \uD83D\uDC4B Aqu\u00ed tienes el resumen de tu simulaci\u00f3n de ahorro con un aire acondicionado solar.\n\n'+
+'*\uD83D\uDCD0 Tu espacio:*\n'+
+'\u2022 Dimensiones: '+anc+'m \u00d7 '+lar+'m \u00d7 '+alt+'m alto\n'+
+'\u2022 \u00c1rea: '+m2t+' m\u00b2 \u00b7 Volumen: '+m3t+' m\u00b3\n'+
+'\u2022 Tipo de uso: '+usoLbl+'\n'+
+'\u2022 Personas habituales: '+per+'\n'+
+'\u2022 Equipos electr\u00f3nicos: '+equ+'\n'+
+'\u2022 Ventanas/Puertas (aislamiento): '+abe+'\n'+
+'\u2022 N\u00famero de espacios: '+nEsp+'\n'+
+'\u2022 Horario de uso: '+horLbl+(hSub?' ('+hSub+')':'')+'\n'+
+'\u2022 Ubicaci\u00f3n: '+depTxt+'\n'+
+'\u2022 Tarifa OR: '+r.tarifa+'\n\n'+
+'*\u26A1 Equipo sugerido:*\n'+
+'\u2022 Modelo: '+r.modelo+'\n'+
+'\u2022 BTU: '+r.btu+'\n\n'+
+'*\uD83D\uDCB0 Inversi\u00f3n estimada (Solar):*\n'+
+'\u2022 Costo del equipo: '+r.valSistema+'\n'+
+'\u2022 Mano de obra (instalaci\u00f3n): '+r.valInstalacion+'\n'+
+'\u2022 Inversi\u00f3n total: '+r.inversionTotal+'\n\n'+
+'*\uD83D\uDCCA Referencia vs. Convencional:*\n'+
+'\u2022 Costo del equipo conv.: '+r.valSistemaConv+'\n'+
+'\u2022 Mano de obra conv.: '+r.valInstalacionConv+'\n'+
+'\u2022 Inversi\u00f3n total conv.: '+r.inversionTotalConv+'\n\n'+
+'*\uD83D\uDCC8 Proyecci\u00f3n financiera:*\n'+
+'\u2022 Ahorro anual: '+r.ahorro+'\n'+
+'\u2022 Payback: '+r.payback+'\n'+
+'\u2022 Retorno a 10 a\u00f1os: '+r.ret10+'\n\n'+
+'*\uD83D\uDC64 Tus datos:*\n'+
+(d.n?'\u2022 Nombre: '+d.n+'\n':'')+
+(d.t?'\u2022 Tel\u00e9fono: '+d.t+'\n':'')+
+(d.e?'\u2022 Correo: '+d.e+'\n':'')+
+'\n\u2705 Pol\u00edtica de tratamiento de datos aceptada.\n\n'+
+'\u00bfTienes preguntas? Escr\u00edbeme y coordinamos los siguientes pasos.'
+);
+window.open(window._WB+'text='+msg,'_blank');
+sst('\u2714 WhatsApp abierto con el resumen. \u00a1Comparte con tu cliente!','lfo');
+}
+function rst(){
+var hd=document.querySelector('header');if(hd)hd.style.display='flex';
+var hr=document.querySelector('.hero');if(hr)hr.style.display='block';
+var ib=document.querySelector('.iso-band');if(ib)ib.style.display='';
+var pn=document.querySelector('.pnav');if(pn){pn.style.display='none';pn.style.top='64px';}
+uf=null;mf=CFG.MF_DIA;tar=CFG.TAR_DEFAULT;window._RES=null;window._CALC=null;
+['ancho','largo','alto'].forEach(function(id){$(id).value='';});
+['per','equ','abe'].forEach(function(id){$(id).value='';});
+$('dep').value='';$('tcard').classList.remove('on');$('mtwrap').classList.remove('on');$('mt').checked=false;$('tman').value='';$('mti').classList.remove('on','inv');$('pvw').classList.remove('show');$('cnt').value=1;
+['lnn','lnt','lne'].forEach(function(id){$(id).value='';});
+$('lpdc').checked=false;$('lpd').classList.remove('inv');
+$('lfs').textContent='';
+$$('#usoGrid .ch').forEach(function(c){c.classList.remove('on');});
+$$('#horGrid .ch').forEach(function(c){c.classList.remove('on');});
+document.querySelector('#horGrid .ch').classList.add('on');
+['fa','fl','fh','fdp','fper','fequ','fabe'].forEach(function(id){$(id).classList.remove('inv');});
+$('usoGrid').classList.remove('inv');$('res').style.display='none';
+$('simMain').style.display='none';$('techIntro').style.display='block';$('featSection').style.display='block';
+$$('[onclick="startSim()"]').forEach(function(b){b.style.display='';});
+var d0=$('d0'),d1=$('d1'),l0=$('l0');
+d0.classList.remove('on','dn');d1.classList.remove('on','dn');l0.classList.remove('dn');d0.classList.add('on');
+$('plbl').textContent='Paso 1 de 2 \u2014 Tu espacio';
+window.scrollTo({top:0,behavior:'smooth'});goStep(0);
+}
+function cop(n){return'$'+Math.round(n).toLocaleString('es-CO');}
+</script>
+</body>
+</html>
